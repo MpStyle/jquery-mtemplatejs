@@ -110,13 +110,10 @@
          */
         private manageRecord(record:any, $clonedTemplate:JQuery) {
             for (var key in record) {
-                console.log(key);
-
                 this.apply(
                     $clonedTemplate,
                     "*[" + MTemplateJS.MT_TEXT + "=" + key + "]",
                     function ($elem:JQuery) {
-                        console.log(record[key]);
                         $elem.html(record[key]);
                     }
                 );
@@ -125,7 +122,6 @@
                     $clonedTemplate,
                     "*[" + MTemplateJS.MT_CLASS + "=" + key + "]",
                     function ($elem:JQuery) {
-                        console.log(record[key]);
                         $elem.addClass(record[key]);
                     }
                 );
@@ -134,7 +130,6 @@
                     $clonedTemplate,
                     "*[" + MTemplateJS.MT_HREF + "=" + key + "]",
                     function ($elem:JQuery) {
-                        console.log(record[key]);
                         $elem.attr("href", record[key]);
                     }
                 );
@@ -149,7 +144,6 @@
          * @param func
          */
         private apply($clonedTemplate:JQuery, query:string, func:($elem:JQuery)=>void) {
-            console.log(query);
             var $elements:JQuery = $clonedTemplate.find(query);
             $elements.each(function (index:number, elem:Element) {
                 func($(elem));
@@ -171,6 +165,11 @@
     }
 
     $.fn.mtemplatejs = function (data:any, directives?:{ [key:string]:($item:JQuery, record:any)=>void }) {
+        if (typeof data != 'Object') {
+            console.log("data is not an Object");
+            return;
+        }
+
         //noinspection TypeScriptUnresolvedFunction
         return this.each(function (index:number, elem:Element) {
             (new MTemplateJS(elem, data, directives)).run();
