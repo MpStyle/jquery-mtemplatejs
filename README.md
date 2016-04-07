@@ -1,4 +1,4 @@
-# mTemplatejs
+# jQuery - MTemplateJS
 
 ## Include
 ```html
@@ -45,14 +45,14 @@ Where _data_ could be:
 ```json
 [
     {
-        aaa: 'Text 01',
-        bbb: 'hidden',
-        ccc: 'http://www.google.it'
+        "aaa": "Text 01",
+        "bbb": "hidden",
+        "ccc": "http://www.google.it"
     },
     {
-        aaa: 'Text 02',
-        bbb: 'visible',
-        ccc: 'http://www.yahoo.it'
+        "aaa": "Text 02",
+        "bbb": "visible",
+        "ccc": "http://www.yahoo.it"
     },
     ...
 ]
