@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jquery-mtemplatejs - Load template</title>
+    <script type="text/javascript" src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="../../dist/jquery-mtemplatejs.min.js"></script>
+</head>
+<body>
+
+<script type="text/javascript">
+    $(function () {
+        $("#content").mtemplatejs([
+            {
+                aaa: 'Text 01',
+                bbb: 'hidden',
+                ccc: 'http://www.google.it'
+            },
+            {
+                aaa: 'Text 02',
+                bbb: 'visible',
+                ccc: 'http://www.yahoo.it'
+            }
+        ], {
+            'ddd': function ($item, record) {
+                $item.text("Hello world!");
+            }
+        });
+    });
+
+</script>
+
+<div id="content" mt-load="template.html"></div>
+
+</body>
+</html>

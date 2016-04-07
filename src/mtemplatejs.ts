@@ -5,15 +5,18 @@ interface JQuery {
 }
 
 (function ($) {
+
     class MTemplateJS {
-        private static MT_USE:string = "mt-use";
-        private static MT_TEXT:string = "mt-text";
-        private static MT_CLASS:string = "mt-class";
-        private static MT_HREF:string = "mt-href";
-        private static MT_FUNC:string = "mt-func";
+        private static MT:string = 'mt';
+        private static MT_LOAD:string = 'mt-load';
+        private static MT_USE:string = 'mt-use';
+        private static MT_TEXT:string = 'mt-text';
+        private static MT_CLASS:string = 'mt-class';
+        private static MT_HREF:string = 'mt-href';
+        private static MT_FUNC:string = 'mt-func';
+        private static UUID_TEMPLATE = 'axx-xxx-xxx';
         private currentElement:Element;
         private $currentElement:JQuery;
-        private templateName:string;
         private $template:JQuery;
         private data:any;
         private directives:{ [key:string]:($item:JQuery, record:any)=>void };
@@ -21,13 +24,38 @@ interface JQuery {
         constructor(element:Element, data:any, directives?:{ [key:string]:($item:JQuery, record:any)=>void }) {
             this.currentElement = element;
             this.$currentElement = $(this.currentElement);
-            this.templateName = this.$currentElement.attr(MTemplateJS.MT_USE);
-            this.$template = $($("[mt=" + this.templateName + "]").html());
             this.data = data;
             this.directives = directives;
         }
 
+        /**
+         * Inits the template.
+         * The template could be inline (in the same html file) or in another file.
+         */
         public run() {
+            var me = this;
+            var templateName:string = this.$currentElement.attr(MTemplateJS.MT_USE);
+
+            if (MTemplateJS.isUndefined(templateName) || templateName == "") {
+                var templateUrl:string = this.$currentElement.attr(MTemplateJS.MT_LOAD);
+
+                if (MTemplateJS.isUndefined(templateUrl) === false && templateUrl !== "") {
+                    $.get(templateUrl, function (data:any) {
+                        me.$template = $(data);
+                        me.manageData();
+                    }, "html");
+                }
+            }
+            else {
+                this.$template = $($("[" + MTemplateJS.MT + "=" + templateName + "]").html());
+                this.manageData();
+            }
+        }
+
+        /**
+         * For each record in data manages the record.
+         */
+        private manageData() {
             var me = this;
 
             if (Array.isArray(this.data)) {
@@ -40,6 +68,11 @@ interface JQuery {
             }
         }
 
+        /**
+         * Manages a record in data.
+         *
+         * @param record
+         */
         private manage(record:any) {
             var $clonedTemplate:JQuery = this.$template.clone();
             var uuid:string = MTemplateJS.generateUUID();
@@ -51,6 +84,12 @@ interface JQuery {
             this.$currentElement.append($clonedTemplate.html());
         }
 
+        /**
+         * Manages the directives.
+         *
+         * @param record
+         * @param $clonedTemplate
+         */
         private manageDirectives(record:any, $clonedTemplate:JQuery) {
             var me:MTemplateJS = this;
             for (var key in this.directives) {
@@ -60,7 +99,7 @@ interface JQuery {
                     function ($elem:JQuery) {
 
                         var directive:($item:JQuery, record:any)=>void = me.directives[key];
-                        if (typeof directive !== 'undefined') {
+                        if (MTemplateJS.isUndefined(directive) === false) {
                             directive($elem, record);
                         }
                     }
@@ -68,6 +107,11 @@ interface JQuery {
             }
         }
 
+        /**
+         *
+         * @param record
+         * @param $clonedTemplate
+         */
         private manageRecord(record:any, $clonedTemplate:JQuery) {
             for (var key in record) {
                 console.log(key);
@@ -101,6 +145,13 @@ interface JQuery {
             }
         }
 
+        /**
+         * Applies the func for the elements selected quering $clonedTemplate.
+         *
+         * @param $clonedTemplate
+         * @param query
+         * @param func
+         */
         private apply($clonedTemplate:JQuery, query:string, func:($elem:JQuery)=>void) {
             console.log(query);
             var $elements:JQuery = $clonedTemplate.find(query);
@@ -111,12 +162,15 @@ interface JQuery {
 
         private static generateUUID():string {
             var d = new Date().getTime();
-            var uuid = 'axx-xxx-xxx'.replace(/[xy]/g, function (c) {
+            return MTemplateJS.UUID_TEMPLATE.replace(/[xy]/g, function (c) {
                 var r = (d + Math.random() * 16) % 16 | 0;
                 d = Math.floor(d / 16);
                 return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
             });
-            return uuid;
+        }
+
+        private static isUndefined(v:any) {
+            return (typeof v === 'undefined');
         }
     }
 
