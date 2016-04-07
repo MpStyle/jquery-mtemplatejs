@@ -1,0 +1,12 @@
+{
+  "name": "mtemplatejs",
+  "version": "0.0.1",
+  "license": "LGPL",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt-contrib-uglify": "~1.0.1",
+    "grunt": "~0.4.5",
+    "grunt-ts": "",
+    "jquery": "~2.2.2"
+  }
+}
