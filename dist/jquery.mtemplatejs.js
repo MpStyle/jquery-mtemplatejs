@@ -55,23 +55,18 @@
         };
         MTemplateJS.prototype.manageRecord = function (record, $clonedTemplate) {
             for (var key in record) {
-                console.log(key);
                 this.apply($clonedTemplate, "*[" + MTemplateJS.MT_TEXT + "=" + key + "]", function ($elem) {
-                    console.log(record[key]);
                     $elem.html(record[key]);
                 });
                 this.apply($clonedTemplate, "*[" + MTemplateJS.MT_CLASS + "=" + key + "]", function ($elem) {
-                    console.log(record[key]);
                     $elem.addClass(record[key]);
                 });
                 this.apply($clonedTemplate, "*[" + MTemplateJS.MT_HREF + "=" + key + "]", function ($elem) {
-                    console.log(record[key]);
                     $elem.attr("href", record[key]);
                 });
             }
         };
         MTemplateJS.prototype.apply = function ($clonedTemplate, query, func) {
-            console.log(query);
             var $elements = $clonedTemplate.find(query);
             $elements.each(function (index, elem) {
                 func($(elem));
@@ -99,6 +94,10 @@
         return MTemplateJS;
     }());
     $.fn.mtemplatejs = function (data, directives) {
+        if (typeof data != 'Object') {
+            console.log("data is not an Object");
+            return;
+        }
         return this.each(function (index, elem) {
             (new MTemplateJS(elem, data, directives)).run();
         });

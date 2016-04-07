@@ -4,7 +4,7 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         ts: {
             default: {
-                files: [{src: ['src/mtemplatejs.ts'], dest: 'dist/jquery-mtemplatejs.js'}],
+                files: [{src: ['src/mtemplatejs.ts'], dest: 'dist/jquery.mtemplatejs.js'}],
                 options: {
                     sourceMap: false,
                     module: 'amd'
@@ -14,7 +14,7 @@ module.exports = function (grunt) {
         uglify: {
             default: {
                 files: {
-                    'dist/jquery-mtemplatejs.min.js': ['dist/jquery-mtemplatejs.js']
+                    'dist/jquery.mtemplatejs.min.js': ['dist/jquery.mtemplatejs.js']
                 }
             },
             options: {
