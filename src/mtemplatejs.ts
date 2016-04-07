@@ -1,8 +1,4 @@
-/// <reference path="libs/jquery.d.ts" />
-
-interface JQuery {
-    mtemplatejs(data:JQuery, directives?:{ [key:string]:($item:JQuery, record:any)=>void }): JQuery;
-}
+/// <reference path="mtemplatejs.d.ts" />
 
 (function ($) {
 
