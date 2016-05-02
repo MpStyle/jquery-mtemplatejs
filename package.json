@@ -1,7 +1,7 @@
 {
   "name": "jquery-mtemplatejs",
   "description": "A template plugin for jQuery. Allows templating without dirtying the JavaScript code with HTML markup. Fast and simple.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "LGPL",
   "dependencies": {},
   "devDependencies": {
