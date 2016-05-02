@@ -8,6 +8,7 @@
         private static MT_TEXT:string = 'data-mt-text';
         private static MT_CLASS:string = 'data-mt-class';
         private static MT_HREF:string = 'data-mt-href';
+        private static MT_SRC:string = 'data-mt-src';
         private static MT_FUNC:string = 'data-mt-func';
         private static UUID_TEMPLATE = 'axx-xxx-xxx';
         private currentElement:Element;
@@ -130,6 +131,14 @@
                     "*[" + MTemplateJS.MT_HREF + "=" + key + "]",
                     function ($elem:JQuery) {
                         $elem.attr("href", record[key]);
+                    }
+                );
+
+                this.apply(
+                    $clonedTemplate,
+                    "*[" + MTemplateJS.MT_SRC + "=" + key + "]",
+                    function ($elem:JQuery) {
+                        $elem.attr("src", record[key]);
                     }
                 );
             }

@@ -12,17 +12,19 @@
     $(function () {
         $("#content").mtemplatejs([
             {
-                aaa: 'Text 01',
-                bbb: 'hidden',
-                ccc: 'http://www.google.it'
+                "aaa": "Text 01",
+                "bbb": "hidden",
+                "ccc": "http://www.google.it",
+                "ddd": "http://www.google.it/logo.gif"
             },
             {
-                aaa: 'Text 02',
-                bbb: 'visible',
-                ccc: 'http://www.yahoo.it'
+                "aaa": "Text 02",
+                "bbb": "visible",
+                "ccc": "http://www.yahoo.it",
+                "ddd": "http://www.yahoo.it/logo.gif"
             }
         ], {
-            'ddd': function ($item, record) {
+            'eee': function ($item, record) {
                 $item.text("Hello world!");
             }
         });
@@ -34,10 +36,14 @@
 
 <script id="template" type="text/html">
 
+    <div>
+
         <span data-mt-text="aaa"></span>
         <span data-mt-class="bbb"></span>
-        <span data-mt-href="ccc"></span>
-        <span data-mt-func="ddd" class="hello"></span>
+        <a data-mt-href="ccc">Link</a>
+        <img data-mt-src="ddd" src="" alt="img"/>
+        <span data-mt-func="eee" class="hello"></span>
+    </div>
 
 </script>
 

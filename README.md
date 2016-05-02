@@ -17,6 +17,7 @@ A template plugin for jQuery. Allows templating without dirtying the JavaScript 
 * data-mt-text
 * data-mt-class
 * data-mt-href
+* data-mt-src
 * data-mt-func
 
 ## Container
@@ -33,7 +34,8 @@ A template plugin for jQuery. Allows templating without dirtying the JavaScript 
     <span data-mt-text="aaa"></span>
     <span data-mt-class="bbb"></span>
     <span data-mt-href="ccc"></span>
-    <span data-mt-func="ddd"></span>
+    <img src="" data-mt-src="ddd" />
+    <span data-mt-func="eee"></span>
 </script>
 
 ```
@@ -48,12 +50,14 @@ Where _data_ could be:
     {
         "aaa": "Text 01",
         "bbb": "hidden",
-        "ccc": "http://www.google.it"
+        "ccc": "http://www.google.it",
+        "ddd": "http://www.google.it/logo.gif"
     },
     {
         "aaa": "Text 02",
         "bbb": "visible",
-        "ccc": "http://www.yahoo.it"
+        "ccc": "http://www.yahoo.it",
+        "ddd": "http://www.yahoo.it/logo.gif"
     },
     ...
 ]
@@ -62,7 +66,7 @@ Where _data_ could be:
 and _config_ could be:
 ```js
 {
-    'ddd': function(record){
+    'eee': function(record){
         return record.aaa.toUpperCase();
     }
 }
