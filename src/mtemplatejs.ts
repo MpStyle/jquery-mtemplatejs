@@ -9,6 +9,8 @@
         private static MT_CLASS:string = 'data-mt-class';
         private static MT_HREF:string = 'data-mt-href';
         private static MT_SRC:string = 'data-mt-src';
+        private static MT_TITLE:string = 'data-mt-title';
+        private static MT_ALT:string = 'data-mt-alt';
         private static MT_FUNC:string = 'data-mt-func';
         private static UUID_TEMPLATE = 'axx-xxx-xxx';
         private currentElement:Element;
@@ -141,6 +143,22 @@
                         $elem.attr("src", record[key]);
                     }
                 );
+
+                this.apply(
+                    $clonedTemplate,
+                    "*[" + MTemplateJS.MT_TITLE + "=" + key + "]",
+                    function ($elem:JQuery) {
+                        $elem.attr("title", record[key]);
+                    }
+                );
+
+                this.apply(
+                    $clonedTemplate,
+                    "*[" + MTemplateJS.MT_ALT + "=" + key + "]",
+                    function ($elem:JQuery) {
+                        $elem.attr("alt", record[key]);
+                    }
+                );
             }
         }
 
@@ -173,9 +191,9 @@
     }
 
     $.fn.mtemplatejs = function (data:any, directives?:{ [key:string]:($item:JQuery, record:any)=>void }) {
-        var d=data;
-        if( Array.isArray(d)===false ){
-            d=[d];
+        var d = data;
+        if (Array.isArray(d) === false) {
+            d = [d];
         }
 
         //noinspection TypeScriptUnresolvedFunction

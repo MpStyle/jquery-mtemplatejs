@@ -67,6 +67,12 @@
                 this.apply($clonedTemplate, "*[" + MTemplateJS.MT_SRC + "=" + key + "]", function ($elem) {
                     $elem.attr("src", record[key]);
                 });
+                this.apply($clonedTemplate, "*[" + MTemplateJS.MT_TITLE + "=" + key + "]", function ($elem) {
+                    $elem.attr("title", record[key]);
+                });
+                this.apply($clonedTemplate, "*[" + MTemplateJS.MT_ALT + "=" + key + "]", function ($elem) {
+                    $elem.attr("alt", record[key]);
+                });
             }
         };
         MTemplateJS.prototype.apply = function ($clonedTemplate, query, func) {
@@ -92,6 +98,8 @@
         MTemplateJS.MT_CLASS = 'data-mt-class';
         MTemplateJS.MT_HREF = 'data-mt-href';
         MTemplateJS.MT_SRC = 'data-mt-src';
+        MTemplateJS.MT_TITLE = 'data-mt-title';
+        MTemplateJS.MT_ALT = 'data-mt-alt';
         MTemplateJS.MT_FUNC = 'data-mt-func';
         MTemplateJS.UUID_TEMPLATE = 'axx-xxx-xxx';
         return MTemplateJS;

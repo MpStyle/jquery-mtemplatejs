@@ -18,6 +18,8 @@ A template plugin for jQuery. Allows templating without dirtying the JavaScript 
 * data-mt-class
 * data-mt-href
 * data-mt-src
+* data-mt-alt
+* data-mt-title
 * data-mt-func
 
 ## Container
@@ -31,15 +33,17 @@ A template plugin for jQuery. Allows templating without dirtying the JavaScript 
 <div id="content" data-mt-use="template"></div>
 
 <script id="template" type="text/html">
-    <span data-mt-text="aaa"></span>
-    <span data-mt-class="bbb"></span>
-    <span data-mt-href="ccc"></span>
-    <img src="" data-mt-src="ddd" />
-    <span data-mt-func="eee"></span>
+    <div>
+        <span data-mt-text="name"></span>
+        <span data-mt-class="css_class"></span>
+        <a data-mt-href="home_page" data-mt-title="link_title">Link</a>
+        <img data-mt-src="logo" src="" data-mt-alt="logo_alternative_text"/>
+        <span data-mt-func="hello"></span>
+    </div>
 </script>
 
 ```
-
+You can also use more than one template attribute in the same tag.
 ```javascript
 $("#content").mtemplatejs(data, config);
 ```
@@ -48,16 +52,20 @@ Where _data_ could be:
 ```json
 [
     {
-        "aaa": "Text 01",
-        "bbb": "hidden",
-        "ccc": "http://www.google.it",
-        "ddd": "http://www.google.it/logo.gif"
+        "name": "Mark Zucca",
+        "css_class": "hidden",
+        "home_page": "http://www.google.it",
+        "logo": "http://www.google.it/logo.gif",
+        "logo_alternative_text": "The logo of the company",
+        "link_title": "Click to follow the link"
     },
     {
-        "aaa": "Text 02",
-        "bbb": "visible",
-        "ccc": "http://www.yahoo.it",
-        "ddd": "http://www.yahoo.it/logo.gif"
+        "name": "Bill Gabbie",
+        "css_class": "visible",
+        "home_page": "http://www.yahoo.it",
+        "logo": "http://www.yahoo.it/logo.gif",
+        "logo_alternative_text": "The logo of the company",
+        "link_title": "Click to follow the link"
     },
     ...
 ]
@@ -66,8 +74,8 @@ Where _data_ could be:
 and _config_ could be:
 ```js
 {
-    'eee': function(record){
-        return record.aaa.toUpperCase();
+    'hello': function ($item, record) {
+        $item.text("Hello world!");
     }
 }
 ```

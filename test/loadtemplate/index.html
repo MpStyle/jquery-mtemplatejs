@@ -12,19 +12,23 @@
     $(function () {
         $("#content").mtemplatejs([
             {
-                "aaa": "Text 01",
-                "bbb": "hidden",
-                "ccc": "http://www.google.it",
-                "ddd": "http://www.google.it/logo.gif"
+                "name": "Mark Zucca",
+                "css_class": "hidden",
+                "home_page": "http://www.google.it",
+                "logo": "http://www.google.it/logo.gif",
+                "logo_alternative_text": "The logo of the company",
+                "link_title": "Click to follow the link"
             },
             {
-                "aaa": "Text 02",
-                "bbb": "visible",
-                "ccc": "http://www.yahoo.it",
-                "ddd": "http://www.yahoo.it/logo.gif"
+                "name": "Bill Gabbie",
+                "css_class": "visible",
+                "home_page": "http://www.yahoo.it",
+                "logo": "http://www.yahoo.it/logo.gif",
+                "logo_alternative_text": "The logo of the company",
+                "link_title": "Click to follow the link"
             }
         ], {
-            'eee': function ($item, record) {
+            'hello': function ($item, record) {
                 $item.text("Hello world!");
             }
         });
