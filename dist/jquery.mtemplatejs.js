@@ -19,7 +19,7 @@
                 }
             }
             else {
-                this.$template = $($("[" + MTemplateJS.MT + "=" + templateName + "]").html());
+                this.$template = $($("#" + templateName).html());
                 this.manageData();
             }
         };
@@ -83,20 +83,19 @@
         MTemplateJS.isUndefined = function (v) {
             return (typeof v === 'undefined');
         };
-        MTemplateJS.MT = 'mt';
-        MTemplateJS.MT_LOAD = 'mt-load';
-        MTemplateJS.MT_USE = 'mt-use';
-        MTemplateJS.MT_TEXT = 'mt-text';
-        MTemplateJS.MT_CLASS = 'mt-class';
-        MTemplateJS.MT_HREF = 'mt-href';
-        MTemplateJS.MT_FUNC = 'mt-func';
+        MTemplateJS.MT_LOAD = 'data-mt-load';
+        MTemplateJS.MT_USE = 'data-mt-use';
+        MTemplateJS.MT_TEXT = 'data-mt-text';
+        MTemplateJS.MT_CLASS = 'data-mt-class';
+        MTemplateJS.MT_HREF = 'data-mt-href';
+        MTemplateJS.MT_FUNC = 'data-mt-func';
         MTemplateJS.UUID_TEMPLATE = 'axx-xxx-xxx';
         return MTemplateJS;
     }());
     $.fn.mtemplatejs = function (data, directives) {
-        if (typeof data != 'Object') {
-            console.log("data is not an Object");
-            return;
+        var d = data;
+        if (Array.isArray(d) === false) {
+            d = [d];
         }
         return this.each(function (index, elem) {
             (new MTemplateJS(elem, data, directives)).run();

@@ -3,13 +3,12 @@
 (function ($) {
 
     class MTemplateJS {
-        private static MT:string = 'mt';
-        private static MT_LOAD:string = 'mt-load';
-        private static MT_USE:string = 'mt-use';
-        private static MT_TEXT:string = 'mt-text';
-        private static MT_CLASS:string = 'mt-class';
-        private static MT_HREF:string = 'mt-href';
-        private static MT_FUNC:string = 'mt-func';
+        private static MT_LOAD:string = 'data-mt-load';
+        private static MT_USE:string = 'data-mt-use';
+        private static MT_TEXT:string = 'data-mt-text';
+        private static MT_CLASS:string = 'data-mt-class';
+        private static MT_HREF:string = 'data-mt-href';
+        private static MT_FUNC:string = 'data-mt-func';
         private static UUID_TEMPLATE = 'axx-xxx-xxx';
         private currentElement:Element;
         private $currentElement:JQuery;
@@ -43,7 +42,7 @@
                 }
             }
             else {
-                this.$template = $($("[" + MTemplateJS.MT + "=" + templateName + "]").html());
+                this.$template = $($("#" + templateName).html());
                 this.manageData();
             }
         }
@@ -165,9 +164,9 @@
     }
 
     $.fn.mtemplatejs = function (data:any, directives?:{ [key:string]:($item:JQuery, record:any)=>void }) {
-        if (typeof data != 'Object') {
-            console.log("data is not an Object");
-            return;
+        var d=data;
+        if( Array.isArray(d)===false ){
+            d=[d];
         }
 
         //noinspection TypeScriptUnresolvedFunction

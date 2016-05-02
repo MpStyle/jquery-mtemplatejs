@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>jquery-mtemplatejs - Inline template</title>
     <script type="text/javascript" src="../../node_modules/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="../../dist/jquery-mtemplatejs.min.js"></script>
+    <script type="text/javascript" src="../../dist/jquery.mtemplatejs.js"></script>
 </head>
 <body>
 
@@ -30,14 +30,14 @@
 
 </script>
 
-<div id="content" mt-use="template"></div>
+<div id="content" data-mt-use="template"></div>
 
-<script mt="template" type="text/html">
+<script id="template" type="text/html">
 
-        <span mt-text="aaa"></span>
-        <span mt-class="bbb"></span>
-        <span mt-href="ccc"></span>
-        <span mt-func="ddd" class="hello"></span>
+        <span data-mt-text="aaa"></span>
+        <span data-mt-class="bbb"></span>
+        <span data-mt-href="ccc"></span>
+        <span data-mt-func="ddd" class="hello"></span>
 
 </script>
 

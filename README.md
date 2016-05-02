@@ -7,32 +7,32 @@
 
 ## Template:
 ```html
-<script mt="..." type="text/html">
+<script id="..." type="text/html">
     ...
 </script>
 ```
 
 ## Template attributes:
-* mt-text
-* mt-class
-* mt-href
-* mt-func
+* data-mt-text
+* data-mt-class
+* data-mt-href
+* data-mt-func
 
 ## Container
 ```html
-<div mt-use="..."></div>
+<div data-mt-use="..."></div>
 ```
 
 ## Fully example
 ```html
 
-<div id="content" mt-use="template"></div>
+<div id="content" data-mt-use="template"></div>
 
-<script mt="template" type="text/html">
-    <span mt-text="aaa"></span>
-    <span mt-class="bbb"></span>
-    <span mt-href="ccc"></span>
-    <span mt-func="ddd"></span>
+<script id="template" type="text/html">
+    <span data-mt-text="aaa"></span>
+    <span data-mt-class="bbb"></span>
+    <span data-mt-href="ccc"></span>
+    <span data-mt-func="ddd"></span>
 </script>
 
 ```
@@ -65,4 +65,24 @@ and _config_ could be:
         return record.aaa.toUpperCase();
     }
 }
+```
+
+## Development
+- Clone the repository
+- Install NPM
+- Install dev dependencies
+```
+npm install typings --global
+```
+- In the root of the project run:
+```
+npm install
+```
+And
+```
+typings install --ambient
+```
+To build run:
+```
+grunt
 ```

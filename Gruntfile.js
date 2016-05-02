@@ -4,7 +4,7 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         ts: {
             default: {
-                files: [{src: ['src/mtemplatejs.ts'], dest: 'dist/jquery.mtemplatejs.js'}],
+                files: [{src: ['typings/main/**/*.ts','src/mtemplatejs.ts'], dest: 'dist/jquery.mtemplatejs.js'}],
                 options: {
                     sourceMap: false,
                     module: 'amd'
