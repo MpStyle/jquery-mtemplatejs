@@ -1,5 +1,6 @@
 # jQuery - MTemplateJS
 A template plugin for jQuery. Allows templating without dirtying the JavaScript code with HTML markup. Fast and simple.
+A lot of attributes supported in only 2,3 KB.
 
 ## Include
 ```html

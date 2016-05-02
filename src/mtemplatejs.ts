@@ -7,10 +7,7 @@
         private static MT_USE:string = 'data-mt-use';
         private static MT_TEXT:string = 'data-mt-text';
         private static MT_CLASS:string = 'data-mt-class';
-        private static MT_HREF:string = 'data-mt-href';
-        private static MT_SRC:string = 'data-mt-src';
-        private static MT_TITLE:string = 'data-mt-title';
-        private static MT_ALT:string = 'data-mt-alt';
+        private static ATTRIBUTES:string[] = ['href', 'src', 'title', 'alt'];
         private static MT_FUNC:string = 'data-mt-func';
         private static UUID_TEMPLATE = 'axx-xxx-xxx';
         private currentElement:Element;
@@ -128,38 +125,20 @@
                     }
                 );
 
-                this.apply(
-                    $clonedTemplate,
-                    "*[" + MTemplateJS.MT_HREF + "=" + key + "]",
-                    function ($elem:JQuery) {
-                        $elem.attr("href", record[key]);
-                    }
-                );
-
-                this.apply(
-                    $clonedTemplate,
-                    "*[" + MTemplateJS.MT_SRC + "=" + key + "]",
-                    function ($elem:JQuery) {
-                        $elem.attr("src", record[key]);
-                    }
-                );
-
-                this.apply(
-                    $clonedTemplate,
-                    "*[" + MTemplateJS.MT_TITLE + "=" + key + "]",
-                    function ($elem:JQuery) {
-                        $elem.attr("title", record[key]);
-                    }
-                );
-
-                this.apply(
-                    $clonedTemplate,
-                    "*[" + MTemplateJS.MT_ALT + "=" + key + "]",
-                    function ($elem:JQuery) {
-                        $elem.attr("alt", record[key]);
-                    }
-                );
+                for (var attribute in MTemplateJS.ATTRIBUTES) {
+                    this.manageAttribute($clonedTemplate, key, record, attribute);
+                }
             }
+        }
+
+        private manageAttribute($clonedTemplate:JQuery, key:any, record:any, attribute:string) {
+            this.apply(
+                $clonedTemplate,
+                "*[" + attribute + "=" + key + "]",
+                function ($elem:JQuery) {
+                    $elem.attr("data-mt-" + attribute, record[key]);
+                }
+            );
         }
 
         /**

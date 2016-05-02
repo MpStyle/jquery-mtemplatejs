@@ -61,19 +61,15 @@
                 this.apply($clonedTemplate, "*[" + MTemplateJS.MT_CLASS + "=" + key + "]", function ($elem) {
                     $elem.addClass(record[key]);
                 });
-                this.apply($clonedTemplate, "*[" + MTemplateJS.MT_HREF + "=" + key + "]", function ($elem) {
-                    $elem.attr("href", record[key]);
-                });
-                this.apply($clonedTemplate, "*[" + MTemplateJS.MT_SRC + "=" + key + "]", function ($elem) {
-                    $elem.attr("src", record[key]);
-                });
-                this.apply($clonedTemplate, "*[" + MTemplateJS.MT_TITLE + "=" + key + "]", function ($elem) {
-                    $elem.attr("title", record[key]);
-                });
-                this.apply($clonedTemplate, "*[" + MTemplateJS.MT_ALT + "=" + key + "]", function ($elem) {
-                    $elem.attr("alt", record[key]);
-                });
+                for (var attribute in MTemplateJS.ATTRIBUTES) {
+                    this.manageAttribute($clonedTemplate, key, record, attribute);
+                }
             }
+        };
+        MTemplateJS.prototype.manageAttribute = function ($clonedTemplate, key, record, attribute) {
+            this.apply($clonedTemplate, "*[" + attribute + "=" + key + "]", function ($elem) {
+                $elem.attr("data-mt-" + attribute, record[key]);
+            });
         };
         MTemplateJS.prototype.apply = function ($clonedTemplate, query, func) {
             var $elements = $clonedTemplate.find(query);
@@ -96,10 +92,7 @@
         MTemplateJS.MT_USE = 'data-mt-use';
         MTemplateJS.MT_TEXT = 'data-mt-text';
         MTemplateJS.MT_CLASS = 'data-mt-class';
-        MTemplateJS.MT_HREF = 'data-mt-href';
-        MTemplateJS.MT_SRC = 'data-mt-src';
-        MTemplateJS.MT_TITLE = 'data-mt-title';
-        MTemplateJS.MT_ALT = 'data-mt-alt';
+        MTemplateJS.ATTRIBUTES = ['href', 'src', 'title', 'alt'];
         MTemplateJS.MT_FUNC = 'data-mt-func';
         MTemplateJS.UUID_TEMPLATE = 'axx-xxx-xxx';
         return MTemplateJS;
