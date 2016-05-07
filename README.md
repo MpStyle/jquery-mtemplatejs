@@ -20,6 +20,7 @@ A lot of attributes supported in only 2,3 KB.
 * data-mt-href
 * data-mt-src
 * data-mt-alt
+* data-mt-data
 * data-mt-title
 * data-mt-func
 
@@ -80,6 +81,9 @@ and _config_ could be:
     }
 }
 ```
+
+## Sub-template
+The support for the sub-template is guaranteed by the tag _data-mt-data_, but only for inline template, see the example/test (_inlinetemplate_).
 
 ## Development
 - Clone the repository

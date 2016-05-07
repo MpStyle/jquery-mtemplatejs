@@ -6,6 +6,7 @@
         private static MT_LOAD:string = 'data-mt-load';
         private static MT_USE:string = 'data-mt-use';
         private static MT_TEXT:string = 'data-mt-text';
+        private static MT_DATA:string = 'data-mt-data';
         private static MT_CLASS:string = 'data-mt-class';
         private static ATTRIBUTES:string[] = ['href', 'src', 'title', 'alt'];
         private static MT_FUNC:string = 'data-mt-func';
@@ -38,6 +39,7 @@
                     $.get(templateUrl, function (data:any) {
                         me.$template = $(data);
                         me.manageData();
+                        console.log(me.$currentElement);
                     }, "html");
                 }
             }
@@ -109,24 +111,31 @@
          */
         private manageRecord(record:any, $clonedTemplate:JQuery) {
             for (var key in record) {
-                this.apply(
-                    $clonedTemplate,
-                    "*[" + MTemplateJS.MT_TEXT + "=" + key + "]",
-                    function ($elem:JQuery) {
-                        $elem.html(record[key]);
-                    }
-                );
+                if (Array.isArray(record[key])) {
+                    $clonedTemplate.find("*[" + MTemplateJS.MT_DATA + "=" + key + "]").each(function () {
+                        (new MTemplateJS(this, record[key])).run();
+                    });
+                }
+                else {
+                    this.apply(
+                        $clonedTemplate,
+                        "*[" + MTemplateJS.MT_TEXT + "=" + key + "]",
+                        function ($elem:JQuery) {
+                            $elem.html(record[key]);
+                        }
+                    );
 
-                this.apply(
-                    $clonedTemplate,
-                    "*[" + MTemplateJS.MT_CLASS + "=" + key + "]",
-                    function ($elem:JQuery) {
-                        $elem.addClass(record[key]);
-                    }
-                );
+                    this.apply(
+                        $clonedTemplate,
+                        "*[" + MTemplateJS.MT_CLASS + "=" + key + "]",
+                        function ($elem:JQuery) {
+                            $elem.addClass(record[key]);
+                        }
+                    );
 
-                for (var attribute in MTemplateJS.ATTRIBUTES) {
-                    this.manageAttribute($clonedTemplate, key, record, attribute);
+                    for (var attribute in MTemplateJS.ATTRIBUTES) {
+                        this.manageAttribute($clonedTemplate, key, record, attribute);
+                    }
                 }
             }
         }

@@ -15,6 +15,7 @@
                     $.get(templateUrl, function (data) {
                         me.$template = $(data);
                         me.manageData();
+                        console.log(me.$currentElement);
                     }, "html");
                 }
             }
@@ -55,14 +56,21 @@
         };
         MTemplateJS.prototype.manageRecord = function (record, $clonedTemplate) {
             for (var key in record) {
-                this.apply($clonedTemplate, "*[" + MTemplateJS.MT_TEXT + "=" + key + "]", function ($elem) {
-                    $elem.html(record[key]);
-                });
-                this.apply($clonedTemplate, "*[" + MTemplateJS.MT_CLASS + "=" + key + "]", function ($elem) {
-                    $elem.addClass(record[key]);
-                });
-                for (var attribute in MTemplateJS.ATTRIBUTES) {
-                    this.manageAttribute($clonedTemplate, key, record, attribute);
+                if (Array.isArray(record[key])) {
+                    $clonedTemplate.find("*[" + MTemplateJS.MT_DATA + "=" + key + "]").each(function () {
+                        (new MTemplateJS(this, record[key])).run();
+                    });
+                }
+                else {
+                    this.apply($clonedTemplate, "*[" + MTemplateJS.MT_TEXT + "=" + key + "]", function ($elem) {
+                        $elem.html(record[key]);
+                    });
+                    this.apply($clonedTemplate, "*[" + MTemplateJS.MT_CLASS + "=" + key + "]", function ($elem) {
+                        $elem.addClass(record[key]);
+                    });
+                    for (var attribute in MTemplateJS.ATTRIBUTES) {
+                        this.manageAttribute($clonedTemplate, key, record, attribute);
+                    }
                 }
             }
         };
@@ -91,6 +99,7 @@
         MTemplateJS.MT_LOAD = 'data-mt-load';
         MTemplateJS.MT_USE = 'data-mt-use';
         MTemplateJS.MT_TEXT = 'data-mt-text';
+        MTemplateJS.MT_DATA = 'data-mt-data';
         MTemplateJS.MT_CLASS = 'data-mt-class';
         MTemplateJS.ATTRIBUTES = ['href', 'src', 'title', 'alt'];
         MTemplateJS.MT_FUNC = 'data-mt-func';
