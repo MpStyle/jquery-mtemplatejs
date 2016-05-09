@@ -14,10 +14,10 @@
         private currentElement:Element;
         private $currentElement:JQuery;
         private $template:JQuery;
-        private data:any;
+        private data:Object[];
         private directives:{ [key:string]:($item:JQuery, record:any)=>void };
 
-        constructor(element:Element, data:any, directives?:{ [key:string]:($item:JQuery, record:any)=>void }) {
+        constructor(element:Element, data:Object[], directives?:{ [key:string]:($item:JQuery, record:any)=>void }) {
             this.currentElement = element;
             this.$currentElement = $(this.currentElement);
             this.data = data;
@@ -29,11 +29,12 @@
          * The template could be inline (in the same html file) or in another file.
          */
         public run() {
-            var me = this;
-            var templateName:string = this.$currentElement.attr(MTemplateJS.MT_USE);
+            let me = this,
+                templateName:string = this.$currentElement.attr(MTemplateJS.MT_USE);
 
+            // Load the template from the URL defined in data-mt-load attribute.
             if (MTemplateJS.isUndefined(templateName) || templateName == "") {
-                var templateUrl:string = this.$currentElement.attr(MTemplateJS.MT_LOAD);
+                let templateUrl:string = this.$currentElement.attr(MTemplateJS.MT_LOAD);
 
                 if (MTemplateJS.isUndefined(templateUrl) === false && templateUrl !== "") {
                     $.get(templateUrl, function (data:any) {
@@ -53,26 +54,28 @@
          * For each record in data manages the record.
          */
         private manageData() {
-            var me = this;
+            let me = this;
 
-            if (Array.isArray(this.data)) {
-                $(this.data).each(function (index, elem) {
-                    me.manage(elem);
-                });
-            }
-            else {
-                me.manage(this.data);
-            }
+            $(this.data).each(function (index, elem) {
+                me.manage(elem);
+            });
         }
 
         /**
-         * Manages a record in data.
+         * Manages a record in data:
+         * <ul>
+         *     <li>Clone the template</li>
+         *     <li>Wrap the template in a div tag</li>
+         *     <li>Set an id attribute to the div wrapper</li>
+         *     <li>Execute the directives</li>
+         *     <li>Manage the mtemplate attributes defined in the template</li>
+         * </ul>
          *
          * @param record
          */
         private manage(record:any) {
-            var $clonedTemplate:JQuery = this.$template.clone();
-            var uuid:string = MTemplateJS.generateUUID();
+            let $clonedTemplate:JQuery = this.$template.clone(),
+                uuid:string = MTemplateJS.generateUUID();
             $clonedTemplate = $('<div>').attr('id', uuid).append($clonedTemplate);
 
             this.manageDirectives(record, $clonedTemplate);
@@ -82,20 +85,19 @@
         }
 
         /**
-         * Manages the directives.
+         * Execute the directive in the cloned template.
          *
          * @param record
          * @param $clonedTemplate
          */
         private manageDirectives(record:any, $clonedTemplate:JQuery) {
-            var me:MTemplateJS = this;
-            for (var key in this.directives) {
+            let me:MTemplateJS = this;
+            for (let key in this.directives) {
                 this.apply(
                     $clonedTemplate,
                     "*[" + MTemplateJS.MT_FUNC + "=" + key + "]",
                     function ($elem:JQuery) {
-
-                        var directive:($item:JQuery, record:any)=>void = me.directives[key];
+                        let directive:($item:JQuery, record:any)=>void = me.directives[key];
                         if (MTemplateJS.isUndefined(directive) === false) {
                             directive($elem, record);
                         }
@@ -105,12 +107,16 @@
         }
 
         /**
+         * Bind the data to the template.
          *
-         * @param record
-         * @param $clonedTemplate
+         * @param record A record of the data to bind in the template
+         * @param $clonedTemplate The cloned template.
          */
         private manageRecord(record:any, $clonedTemplate:JQuery) {
-            for (var key in record) {
+            let me = this;
+            for (let k in record) {
+                let key:string = k;
+
                 if (Array.isArray(record[key])) {
                     $clonedTemplate.find("*[" + MTemplateJS.MT_DATA + "=" + key + "]").each(function () {
                         (new MTemplateJS(this, record[key])).run();
@@ -133,13 +139,27 @@
                         }
                     );
 
-                    for (var attribute in MTemplateJS.ATTRIBUTES) {
-                        this.manageAttribute($clonedTemplate, key, record, attribute);
-                    }
+                    MTemplateJS.ATTRIBUTES.forEach(function (attribute:string) {
+                        me.manageAttribute($clonedTemplate, key, record, attribute);
+                    });
                 }
             }
         }
 
+        /**
+         * Generic method to create an attribute in the element with the associated mtemplate attributes:
+         * <ul>
+         *     <li>
+         *         data-mt-title will create the attribute title in the selected element and the value will be the value
+         *         of the key in the data.
+         *     </li>
+         * </ul>
+         *
+         * @param $clonedTemplate
+         * @param key
+         * @param record
+         * @param attribute
+         */
         private manageAttribute($clonedTemplate:JQuery, key:any, record:any, attribute:string) {
             this.apply(
                 $clonedTemplate,
@@ -151,42 +171,53 @@
         }
 
         /**
-         * Applies the func for the elements selected quering $clonedTemplate.
+         * Applies the <i>func</i> for the elements selected quering $clonedTemplate.
          *
          * @param $clonedTemplate
          * @param query
          * @param func
          */
         private apply($clonedTemplate:JQuery, query:string, func:($elem:JQuery)=>void) {
-            var $elements:JQuery = $clonedTemplate.find(query);
+            let $elements:JQuery = $clonedTemplate.find(query);
             $elements.each(function (index:number, elem:Element) {
                 func($(elem));
             })
         }
 
+        /**
+         * Generic method. It generates a UUIS.
+         *
+         * @returns {string}
+         */
         private static generateUUID():string {
-            var d = new Date().getTime();
+            let d = new Date().getTime();
             return MTemplateJS.UUID_TEMPLATE.replace(/[xy]/g, function (c) {
-                var r = (d + Math.random() * 16) % 16 | 0;
+                let r = (d + Math.random() * 16) % 16 | 0;
                 d = Math.floor(d / 16);
                 return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
             });
         }
 
-        private static isUndefined(v:any) {
+        /**
+         * Check if <i>v</i> is defined.
+         *
+         * @param v
+         * @returns {boolean}
+         */
+        private static isUndefined(v:any):boolean {
             return (typeof v === 'undefined');
         }
     }
 
     $.fn.mtemplatejs = function (data:any, directives?:{ [key:string]:($item:JQuery, record:any)=>void }) {
-        var d = data;
+        let d = data;
         if (Array.isArray(d) === false) {
             d = [d];
         }
 
         //noinspection TypeScriptUnresolvedFunction
         return this.each(function (index:number, elem:Element) {
-            (new MTemplateJS(elem, data, directives)).run();
+            (new MTemplateJS(elem, d, directives)).run();
         });
     };
 

@@ -7,8 +7,7 @@
             this.directives = directives;
         }
         MTemplateJS.prototype.run = function () {
-            var me = this;
-            var templateName = this.$currentElement.attr(MTemplateJS.MT_USE);
+            var me = this, templateName = this.$currentElement.attr(MTemplateJS.MT_USE);
             if (MTemplateJS.isUndefined(templateName) || templateName == "") {
                 var templateUrl = this.$currentElement.attr(MTemplateJS.MT_LOAD);
                 if (MTemplateJS.isUndefined(templateUrl) === false && templateUrl !== "") {
@@ -26,18 +25,12 @@
         };
         MTemplateJS.prototype.manageData = function () {
             var me = this;
-            if (Array.isArray(this.data)) {
-                $(this.data).each(function (index, elem) {
-                    me.manage(elem);
-                });
-            }
-            else {
-                me.manage(this.data);
-            }
+            $(this.data).each(function (index, elem) {
+                me.manage(elem);
+            });
         };
         MTemplateJS.prototype.manage = function (record) {
-            var $clonedTemplate = this.$template.clone();
-            var uuid = MTemplateJS.generateUUID();
+            var $clonedTemplate = this.$template.clone(), uuid = MTemplateJS.generateUUID();
             $clonedTemplate = $('<div>').attr('id', uuid).append($clonedTemplate);
             this.manageDirectives(record, $clonedTemplate);
             this.manageRecord(record, $clonedTemplate);
@@ -45,33 +38,43 @@
         };
         MTemplateJS.prototype.manageDirectives = function (record, $clonedTemplate) {
             var me = this;
-            for (var key in this.directives) {
-                this.apply($clonedTemplate, "*[" + MTemplateJS.MT_FUNC + "=" + key + "]", function ($elem) {
+            var _loop_1 = function(key) {
+                this_1.apply($clonedTemplate, "*[" + MTemplateJS.MT_FUNC + "=" + key + "]", function ($elem) {
                     var directive = me.directives[key];
                     if (MTemplateJS.isUndefined(directive) === false) {
                         directive($elem, record);
                     }
                 });
+            };
+            var this_1 = this;
+            for (var key in this.directives) {
+                _loop_1(key);
             }
         };
         MTemplateJS.prototype.manageRecord = function (record, $clonedTemplate) {
-            for (var key in record) {
+            var me = this;
+            var _loop_2 = function(k) {
+                var key = k;
                 if (Array.isArray(record[key])) {
                     $clonedTemplate.find("*[" + MTemplateJS.MT_DATA + "=" + key + "]").each(function () {
                         (new MTemplateJS(this, record[key])).run();
                     });
                 }
                 else {
-                    this.apply($clonedTemplate, "*[" + MTemplateJS.MT_TEXT + "=" + key + "]", function ($elem) {
+                    this_2.apply($clonedTemplate, "*[" + MTemplateJS.MT_TEXT + "=" + key + "]", function ($elem) {
                         $elem.html(record[key]);
                     });
-                    this.apply($clonedTemplate, "*[" + MTemplateJS.MT_CLASS + "=" + key + "]", function ($elem) {
+                    this_2.apply($clonedTemplate, "*[" + MTemplateJS.MT_CLASS + "=" + key + "]", function ($elem) {
                         $elem.addClass(record[key]);
                     });
-                    for (var attribute in MTemplateJS.ATTRIBUTES) {
-                        this.manageAttribute($clonedTemplate, key, record, attribute);
-                    }
+                    MTemplateJS.ATTRIBUTES.forEach(function (attribute) {
+                        me.manageAttribute($clonedTemplate, key, record, attribute);
+                    });
                 }
+            };
+            var this_2 = this;
+            for (var k in record) {
+                _loop_2(k);
             }
         };
         MTemplateJS.prototype.manageAttribute = function ($clonedTemplate, key, record, attribute) {
@@ -112,7 +115,7 @@
             d = [d];
         }
         return this.each(function (index, elem) {
-            (new MTemplateJS(elem, data, directives)).run();
+            (new MTemplateJS(elem, d, directives)).run();
         });
     };
 })(jQuery);
