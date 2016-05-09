@@ -1,24 +1,22 @@
 (function ($) {
     var MTemplateJS = (function () {
         function MTemplateJS(element, data, directives) {
+            this.subTemplates = {};
             this.currentElement = element;
             this.$currentElement = $(this.currentElement);
             this.data = data;
             this.directives = directives;
         }
         MTemplateJS.prototype.run = function () {
-            var me = this, templateName = this.$currentElement.attr(MTemplateJS.MT_USE);
-            if (MTemplateJS.isUndefined(templateName) || templateName == "") {
-                var templateUrl = this.$currentElement.attr(MTemplateJS.MT_LOAD);
-                if (MTemplateJS.isUndefined(templateUrl) === false && templateUrl !== "") {
-                    $.get(templateUrl, function (data) {
-                        me.$template = $(data);
-                        me.manageData();
-                        console.log(me.$currentElement);
-                    }, "html");
-                }
+            var me = this, templateName = this.$currentElement.attr(MTemplateJS.MT_USE), templateUrl = this.$currentElement.attr(MTemplateJS.MT_LOAD);
+            if (templateUrl) {
+                $.get(templateUrl, function (data) {
+                    me.$template = $(data);
+                    me.manageData();
+                    console.log(me.$currentElement);
+                }, "html");
             }
-            else {
+            if (templateName) {
                 this.$template = $($("#" + templateName).html());
                 this.manageData();
             }
@@ -30,18 +28,31 @@
             });
         };
         MTemplateJS.prototype.manage = function (record) {
-            var $clonedTemplate = this.$template.clone(), uuid = MTemplateJS.generateUUID();
+            var $clonedTemplate = this.$template.clone(), uuid = MTemplateJS.UUIDGenerator();
             $clonedTemplate = $('<div>').attr('id', uuid).append($clonedTemplate);
             this.manageDirectives(record, $clonedTemplate);
             this.manageRecord(record, $clonedTemplate);
             this.$currentElement.append($clonedTemplate.html());
+            this.$currentElement.removeAttr(MTemplateJS.MT_LOAD);
+            this.$currentElement.removeAttr(MTemplateJS.MT_USE);
+            this.manageSubTemplate();
+        };
+        MTemplateJS.prototype.manageSubTemplate = function () {
+            var me = this;
+            $.each(me.subTemplates, function (key, value) {
+                var query = MTemplateJS.queryGenerator(MTemplateJS.MT_SUBTEMPLATE, key);
+                $(query).each(function (index, el) {
+                    (new MTemplateJS(el, MTemplateJS.arrayGenerator(value), me.directives)).run();
+                    el.removeAttribute(MTemplateJS.MT_SUBTEMPLATE);
+                });
+            });
         };
         MTemplateJS.prototype.manageDirectives = function (record, $clonedTemplate) {
             var me = this;
             var _loop_1 = function(key) {
                 this_1.apply($clonedTemplate, MTemplateJS.MT_FUNC, key, function ($elem) {
                     var directive = me.directives[key];
-                    if (MTemplateJS.isUndefined(directive) === false) {
+                    if (directive) {
                         directive($elem, record);
                     }
                 });
@@ -55,22 +66,20 @@
             var me = this;
             var _loop_2 = function(k) {
                 var key = k;
-                if (Array.isArray(record[key])) {
-                    $clonedTemplate.find(MTemplateJS.queryGenerator(MTemplateJS.MT_DATA, key)).each(function () {
-                        (new MTemplateJS(this, record[key])).run();
-                    });
-                }
-                else {
-                    this_2.apply($clonedTemplate, MTemplateJS.MT_TEXT, key, function ($elem) {
-                        $elem.html(record[key]);
-                    });
-                    this_2.apply($clonedTemplate, MTemplateJS.MT_CLASS, key, function ($elem) {
-                        $elem.addClass(record[key]);
-                    });
-                    MTemplateJS.ATTRIBUTES.forEach(function (attribute) {
-                        me.manageAttribute($clonedTemplate, key, record, attribute);
-                    });
-                }
+                this_2.apply($clonedTemplate, MTemplateJS.MT_TEXT, key, function ($elem) {
+                    $elem.html(record[key]);
+                });
+                this_2.apply($clonedTemplate, MTemplateJS.MT_CLASS, key, function ($elem) {
+                    $elem.addClass(record[key]);
+                });
+                this_2.apply($clonedTemplate, MTemplateJS.MT_DATA, key, function ($elem) {
+                    var subTemplateKey = MTemplateJS.UUIDGenerator();
+                    $elem.attr(MTemplateJS.MT_SUBTEMPLATE, subTemplateKey);
+                    me.subTemplates[subTemplateKey] = record[key];
+                });
+                MTemplateJS.ATTRIBUTES.forEach(function (attribute) {
+                    me.manageAttribute($clonedTemplate, key, record, attribute);
+                });
             };
             var this_2 = this;
             for (var k in record) {
@@ -83,7 +92,7 @@
             });
         };
         MTemplateJS.prototype.apply = function ($clonedTemplate, attributeName, attributeValue, func) {
-            var me = this, $elements = $clonedTemplate.find(MTemplateJS.queryGenerator(attributeName, attributeValue));
+            var query = MTemplateJS.queryGenerator(attributeName, attributeValue), $elements = $clonedTemplate.find(query);
             $elements.each(function (index, elem) {
                 func($(elem));
                 $(elem).removeAttr(attributeName);
@@ -92,7 +101,14 @@
         MTemplateJS.queryGenerator = function (attributeName, attributeValue) {
             return "*[" + attributeName + "=" + attributeValue + "]";
         };
-        MTemplateJS.generateUUID = function () {
+        MTemplateJS.arrayGenerator = function (value) {
+            var d = value;
+            if (Array.isArray(d) === false) {
+                d = [d];
+            }
+            return d;
+        };
+        MTemplateJS.UUIDGenerator = function () {
             var d = new Date().getTime();
             return MTemplateJS.UUID_TEMPLATE.replace(/[xy]/g, function (c) {
                 var r = (d + Math.random() * 16) % 16 | 0;
@@ -100,26 +116,20 @@
                 return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
             });
         };
-        MTemplateJS.isUndefined = function (v) {
-            return (typeof v === 'undefined');
-        };
         MTemplateJS.MT_LOAD = 'data-mt-load';
         MTemplateJS.MT_USE = 'data-mt-use';
         MTemplateJS.MT_TEXT = 'data-mt-text';
         MTemplateJS.MT_DATA = 'data-mt-data';
         MTemplateJS.MT_CLASS = 'data-mt-class';
+        MTemplateJS.MT_SUBTEMPLATE = 'data-mt-subtemplate';
         MTemplateJS.ATTRIBUTES = ['href', 'src', 'title', 'alt'];
         MTemplateJS.MT_FUNC = 'data-mt-func';
         MTemplateJS.UUID_TEMPLATE = 'axx-xxx-xxx';
         return MTemplateJS;
     }());
     $.fn.mtemplatejs = function (data, directives) {
-        var d = data;
-        if (Array.isArray(d) === false) {
-            d = [d];
-        }
         return this.each(function (index, elem) {
-            (new MTemplateJS(elem, d, directives)).run();
+            (new MTemplateJS(elem, MTemplateJS.arrayGenerator(data), directives)).run();
         });
     };
 })(jQuery);

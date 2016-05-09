@@ -83,7 +83,7 @@ and _config_ could be:
 ```
 
 ## Sub-template
-The support for the sub-template is guaranteed by the tag _data-mt-data_, but only for inline template, see the example/test (_inlinetemplate_).
+The support for the sub-template is guaranteed by the tag _data-mt-data_.
 
 ## Development
 - Clone the repository
