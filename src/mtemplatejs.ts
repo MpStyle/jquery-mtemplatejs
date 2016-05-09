@@ -95,7 +95,8 @@
             for (let key in this.directives) {
                 this.apply(
                     $clonedTemplate,
-                    "*[" + MTemplateJS.MT_FUNC + "=" + key + "]",
+                    MTemplateJS.MT_FUNC,
+                    key,
                     function ($elem:JQuery) {
                         let directive:($item:JQuery, record:any)=>void = me.directives[key];
                         if (MTemplateJS.isUndefined(directive) === false) {
@@ -118,14 +119,15 @@
                 let key:string = k;
 
                 if (Array.isArray(record[key])) {
-                    $clonedTemplate.find("*[" + MTemplateJS.MT_DATA + "=" + key + "]").each(function () {
+                    $clonedTemplate.find(MTemplateJS.queryGenerator(MTemplateJS.MT_DATA,key)).each(function () {
                         (new MTemplateJS(this, record[key])).run();
                     });
                 }
                 else {
                     this.apply(
                         $clonedTemplate,
-                        "*[" + MTemplateJS.MT_TEXT + "=" + key + "]",
+                        MTemplateJS.MT_TEXT,
+                        key,
                         function ($elem:JQuery) {
                             $elem.html(record[key]);
                         }
@@ -133,7 +135,8 @@
 
                     this.apply(
                         $clonedTemplate,
-                        "*[" + MTemplateJS.MT_CLASS + "=" + key + "]",
+                        MTemplateJS.MT_CLASS,
+                        key,
                         function ($elem:JQuery) {
                             $elem.addClass(record[key]);
                         }
@@ -163,9 +166,10 @@
         private manageAttribute($clonedTemplate:JQuery, key:any, record:any, attribute:string) {
             this.apply(
                 $clonedTemplate,
-                "*[" + attribute + "=" + key + "]",
+                "data-mt-" + attribute,
+                key,
                 function ($elem:JQuery) {
-                    $elem.attr("data-mt-" + attribute, record[key]);
+                    $elem.attr( attribute, record[key]);
                 }
             );
         }
@@ -174,14 +178,22 @@
          * Applies the <i>func</i> for the elements selected quering $clonedTemplate.
          *
          * @param $clonedTemplate
-         * @param query
+         * @param attributeName
+         * @param attributeValue
          * @param func
          */
-        private apply($clonedTemplate:JQuery, query:string, func:($elem:JQuery)=>void) {
-            let $elements:JQuery = $clonedTemplate.find(query);
+        private apply($clonedTemplate:JQuery, attributeName:string, attributeValue:string, func:($elem:JQuery)=>void) {
+            let me = this,
+                $elements:JQuery = $clonedTemplate.find(MTemplateJS.queryGenerator(attributeName, attributeValue));
+
             $elements.each(function (index:number, elem:Element) {
                 func($(elem));
+                $(elem).removeAttr(attributeName)
             })
+        }
+
+        private static queryGenerator(attributeName:string, attributeValue:string):string {
+            return "*[" + attributeName + "=" + attributeValue + "]";
         }
 
         /**
