@@ -11,7 +11,6 @@
         private static MT_SUBTEMPLATE:string = 'data-mt-subtemplate';
         private static ATTRIBUTES:string[] = ['href', 'src', 'title', 'alt'];
         private static MT_FUNC:string = 'data-mt-func';
-        private static UUID_TEMPLATE = 'axx-xxx-xxx';
         private currentElement:Element;
         private $currentElement:JQuery;
         private $template:JQuery;
@@ -128,9 +127,7 @@
          */
         private manageRecord(record:any, $clonedTemplate:JQuery) {
             let me = this;
-            for (let k in record) {
-                let key:string = k;
-
+            for (let key in record) {
                 this.apply(
                     $clonedTemplate,
                     MTemplateJS.MT_TEXT,
@@ -229,12 +226,7 @@
          * @returns {string}
          */
         private static UUIDGenerator():string {
-            let d = new Date().getTime();
-            return MTemplateJS.UUID_TEMPLATE.replace(/[xy]/g, function (c) {
-                let r = (d + Math.random() * 16) % 16 | 0;
-                d = Math.floor(d / 16);
-                return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-            });
+            return 'a' + (((1 + Math.random()) * 0x1000000) | 0).toString(16).substring(1);
         }
     }
 

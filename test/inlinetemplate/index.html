@@ -11,6 +11,8 @@
     <title>jquery-mtemplatejs - Inline template</title>
     <script type="text/javascript" src="../../node_modules/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="../../dist/jquery.mtemplatejs.js"></script>
+
+    <link type="text/css" rel="Stylesheet" href="../style.css"/>
 </head>
 <body>
 
@@ -44,16 +46,17 @@
 
 </script>
 
+<h1>Inline template example</h1>
 <div id="content" data-mt-use="template"></div>
 
 <script id="template" type="text/html">
 
-    <div>
-        <span data-mt-text="name"></span>
-        <span data-mt-class="css_class"></span>
+    <div class="data_container">
+        <div data-mt-text="name"></div>
+        <div data-mt-class="css_class"></div>
         <a data-mt-href="home_page" data-mt-title="link_title">Link</a>
         <img data-mt-src="logo" src="" data-mt-alt="logo_alternative_text"/>
-        <span data-mt-func="hello"></span>
+        <div data-mt-func="hello"></div>
         <ul data-mt-data="tags" data-mt-use="template_tag">
 
         </ul>
