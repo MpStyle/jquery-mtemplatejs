@@ -12,7 +12,7 @@
             this.currentElement = element;
             this.$currentElement = $(this.currentElement);
             this.data = data;
-            this.option = option;
+            this.option = option ? option : new MTemplateJSOption();
         }
         MTemplateJS.prototype.run = function () {
             var me = this, templateName = this.$currentElement.attr(MTemplateJS.MT_USE), templateUrl = this.$currentElement.attr(MTemplateJS.MT_LOAD);

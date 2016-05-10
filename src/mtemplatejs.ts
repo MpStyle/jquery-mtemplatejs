@@ -27,7 +27,7 @@
             this.currentElement = element;
             this.$currentElement = $(this.currentElement);
             this.data = data;
-            this.option = option;
+            this.option = option ? option : new MTemplateJSOption();
         }
 
         /**
@@ -247,7 +247,7 @@
         }
     }
 
-    $.fn.mtemplatejs = function (data:any, option:MTemplateJSOption) {
+    $.fn.mtemplatejs = function (data:any, option?:MTemplateJSOption) {
         //noinspection TypeScriptUnresolvedFunction
         return this.each(function (index:number, elem:Element) {
             (new MTemplateJS(elem, MTemplateJS.arrayGenerator(data), option)).run();
