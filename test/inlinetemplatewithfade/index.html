@@ -8,7 +8,7 @@
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
 
-    <title>jquery-mtemplatejs - Inline template</title>
+    <title>jquery-mtemplatejs - Inline template with fade effect</title>
     <script type="text/javascript" src="../../node_modules/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="../../dist/jquery.mtemplatejs.js"></script>
 
@@ -42,13 +42,15 @@
                 'hello': function ($item, record) {
                     $item.text("Hello world!");
                 }
-            }
+            },
+            effect: 'fade',
+            effectDuration: 1000
         });
     });
 
 </script>
 
-<h1>Inline template example</h1>
+<h1>Inline template example with fade effect</h1>
 <div id="content" data-mt-use="template"></div>
 
 <script id="template" type="text/html">

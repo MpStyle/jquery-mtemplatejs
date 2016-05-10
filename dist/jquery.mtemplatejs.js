@@ -1,11 +1,18 @@
 (function ($) {
+    var MTemplateJSOption = (function () {
+        function MTemplateJSOption() {
+            this.directives = {};
+        }
+        return MTemplateJSOption;
+    }());
     var MTemplateJS = (function () {
-        function MTemplateJS(element, data, directives) {
+        function MTemplateJS(element, data, option) {
+            this.option = new MTemplateJSOption();
             this.subTemplates = {};
             this.currentElement = element;
             this.$currentElement = $(this.currentElement);
             this.data = data;
-            this.directives = directives;
+            this.option = option;
         }
         MTemplateJS.prototype.run = function () {
             var me = this, templateName = this.$currentElement.attr(MTemplateJS.MT_USE), templateUrl = this.$currentElement.attr(MTemplateJS.MT_LOAD);
@@ -32,17 +39,27 @@
             $clonedTemplate = $('<div>').attr('id', uuid).append($clonedTemplate);
             this.manageDirectives(record, $clonedTemplate);
             this.manageRecord(record, $clonedTemplate);
-            this.$currentElement.append($clonedTemplate.html());
+            this.append($clonedTemplate);
             this.$currentElement.removeAttr(MTemplateJS.MT_LOAD);
             this.$currentElement.removeAttr(MTemplateJS.MT_USE);
             this.manageSubTemplate();
+        };
+        MTemplateJS.prototype.append = function ($clonedTemplate) {
+            switch (this.option.effect) {
+                case 'fade':
+                    $clonedTemplate.hide().appendTo(this.$currentElement).fadeIn(this.option.effectDuration);
+                    break;
+                default:
+                    this.$currentElement.append($clonedTemplate.html());
+                    break;
+            }
         };
         MTemplateJS.prototype.manageSubTemplate = function () {
             var me = this;
             $.each(me.subTemplates, function (key, value) {
                 var query = MTemplateJS.queryGenerator(MTemplateJS.MT_SUBTEMPLATE, key);
                 $(query).each(function (index, el) {
-                    (new MTemplateJS(el, MTemplateJS.arrayGenerator(value), me.directives)).run();
+                    (new MTemplateJS(el, MTemplateJS.arrayGenerator(value), me.option)).run();
                     el.removeAttribute(MTemplateJS.MT_SUBTEMPLATE);
                 });
             });
@@ -51,14 +68,14 @@
             var me = this;
             var _loop_1 = function(key) {
                 this_1.apply($clonedTemplate, MTemplateJS.MT_FUNC, key, function ($elem) {
-                    var directive = me.directives[key];
+                    var directive = me.option.directives[key];
                     if (directive) {
                         directive($elem, record);
                     }
                 });
             };
             var this_1 = this;
-            for (var key in this.directives) {
+            for (var key in this.option.directives) {
                 _loop_1(key);
             }
         };
@@ -120,9 +137,9 @@
         MTemplateJS.MT_FUNC = 'data-mt-func';
         return MTemplateJS;
     }());
-    $.fn.mtemplatejs = function (data, directives) {
+    $.fn.mtemplatejs = function (data, option) {
         return this.each(function (index, elem) {
-            (new MTemplateJS(elem, MTemplateJS.arrayGenerator(data), directives)).run();
+            (new MTemplateJS(elem, MTemplateJS.arrayGenerator(data), option)).run();
         });
     };
 })(jQuery);

@@ -38,8 +38,10 @@
                 "tags": [{tag: "ms"}, {tag: "multicolor"}]
             }
         ], {
-            'hello': function ($item, record) {
-                $item.text("Hello world!");
+            directives: {
+                'hello': function ($item, record) {
+                    $item.text("Hello world!");
+                }
             }
         });
     });

@@ -1,6 +1,11 @@
 /// <reference path="mtemplatejs.d.ts" />
 
 (function ($) {
+    class MTemplateJSOption {
+        directives:{ [key:string]:($item:JQuery, record:any)=>void } = {};
+        effect:string;
+        effectDuration:number;
+    }
 
     class MTemplateJS {
         private static MT_LOAD:string = 'data-mt-load';
@@ -15,14 +20,14 @@
         private $currentElement:JQuery;
         private $template:JQuery;
         private data:Object[];
-        private directives:{ [key:string]:($item:JQuery, record:any)=>void };
+        private option:MTemplateJSOption = new MTemplateJSOption();
         private subTemplates:{[key:string]:Object} = {};
 
-        constructor(element:Element, data:Object[], directives?:{ [key:string]:($item:JQuery, record:any)=>void }) {
+        constructor(element:Element, data:Object[], option?:MTemplateJSOption) {
             this.currentElement = element;
             this.$currentElement = $(this.currentElement);
             this.data = data;
-            this.directives = directives;
+            this.option = option;
         }
 
         /**
@@ -78,10 +83,22 @@
             this.manageDirectives(record, $clonedTemplate);
             this.manageRecord(record, $clonedTemplate);
 
-            this.$currentElement.append($clonedTemplate.html());
+            this.append($clonedTemplate);
+
             this.$currentElement.removeAttr(MTemplateJS.MT_LOAD);
             this.$currentElement.removeAttr(MTemplateJS.MT_USE);
             this.manageSubTemplate();
+        }
+
+        private append($clonedTemplate) {
+            switch (this.option.effect) {
+                case 'fade':
+                    $clonedTemplate.hide().appendTo(this.$currentElement).fadeIn(this.option.effectDuration);
+                    break;
+                default:
+                    this.$currentElement.append($clonedTemplate.html());
+                    break;
+            }
         }
 
         private manageSubTemplate() {
@@ -90,7 +107,7 @@
             $.each(me.subTemplates, function (key:string, value:Object) {
                 var query:string = MTemplateJS.queryGenerator(MTemplateJS.MT_SUBTEMPLATE, key);
                 $(query).each(function (index, el:Element) {
-                    (new MTemplateJS(el, MTemplateJS.arrayGenerator(value), me.directives)).run();
+                    (new MTemplateJS(el, MTemplateJS.arrayGenerator(value), me.option)).run();
                     el.removeAttribute(MTemplateJS.MT_SUBTEMPLATE);
                 });
             });
@@ -104,13 +121,13 @@
          */
         private manageDirectives(record:any, $clonedTemplate:JQuery) {
             let me:MTemplateJS = this;
-            for (let key in this.directives) {
+            for (let key in this.option.directives) {
                 this.apply(
                     $clonedTemplate,
                     MTemplateJS.MT_FUNC,
                     key,
                     function ($elem:JQuery) {
-                        let directive:($item:JQuery, record:any)=>void = me.directives[key];
+                        let directive:($item:JQuery, record:any)=>void = me.option.directives[key];
                         if (directive) {
                             directive($elem, record);
                         }
@@ -230,10 +247,10 @@
         }
     }
 
-    $.fn.mtemplatejs = function (data:any, directives?:{ [key:string]:($item:JQuery, record:any)=>void }) {
+    $.fn.mtemplatejs = function (data:any, option:MTemplateJSOption) {
         //noinspection TypeScriptUnresolvedFunction
         return this.each(function (index:number, elem:Element) {
-            (new MTemplateJS(elem, MTemplateJS.arrayGenerator(data), directives)).run();
+            (new MTemplateJS(elem, MTemplateJS.arrayGenerator(data), option)).run();
         });
     };
 

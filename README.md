@@ -76,11 +76,18 @@ Where _data_ could be:
 and _config_ could be:
 ```js
 {
-    'hello': function ($item, record) {
-        $item.text("Hello world!");
-    }
+    directives: {
+        'hello': function ($item, record) {
+            $item.text("Hello world!");
+        }
+    },
+    effect: 'fade',
+    effectDuration: 1000
 }
 ```
+
+## Effects
+The only effect supported when it is appending an item is fade.
 
 ## Sub-template
 The support for the sub-template is guaranteed by the tag _data-mt-data_.
