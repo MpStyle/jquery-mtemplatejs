@@ -47,7 +47,8 @@
         MTemplateJS.prototype.append = function ($clonedTemplate) {
             switch (this.option.effect) {
                 case 'fade':
-                    $clonedTemplate.html().hide().appendTo(this.$currentElement).fadeIn(this.option.effectDuration);
+                    var $element = $($clonedTemplate.html());
+                    $element.hide().appendTo(this.$currentElement).fadeIn(this.option.effectDuration);
                     break;
                 default:
                     this.$currentElement.append($clonedTemplate.html());
