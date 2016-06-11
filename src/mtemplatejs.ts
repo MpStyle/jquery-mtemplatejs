@@ -85,8 +85,9 @@
 
             this.append($clonedTemplate);
 
-            this.$currentElement.removeAttr(MTemplateJS.MT_LOAD);
-            this.$currentElement.removeAttr(MTemplateJS.MT_USE);
+            // If remove the attributes multiple executions of the plugin could not work correctly
+            // this.$currentElement.removeAttr(MTemplateJS.MT_LOAD);
+            // this.$currentElement.removeAttr(MTemplateJS.MT_USE);
             this.manageSubTemplate();
         }
 
@@ -109,7 +110,7 @@
                 var query:string = MTemplateJS.queryGenerator(MTemplateJS.MT_SUBTEMPLATE, key);
                 $(query).each(function (index, el:Element) {
                     (new MTemplateJS(el, MTemplateJS.arrayGenerator(value), me.option)).run();
-                    el.removeAttribute(MTemplateJS.MT_SUBTEMPLATE);
+                    // el.removeAttribute(MTemplateJS.MT_SUBTEMPLATE);
                 });
             });
         }
@@ -221,7 +222,7 @@
 
             $elements.each(function (index:number, elem:Element) {
                 func($(elem));
-                $(elem).removeAttr(attributeName);
+                // $(elem).removeAttr(attributeName);
             })
         }
 

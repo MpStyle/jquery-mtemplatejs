@@ -111,3 +111,8 @@ To build run:
 ```
 grunt
 ```
+
+## History
+
+### 0.0.16
+- The mt attributes will mantained when the plugin ends the execution.

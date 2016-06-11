@@ -40,8 +40,6 @@
             this.manageDirectives(record, $clonedTemplate);
             this.manageRecord(record, $clonedTemplate);
             this.append($clonedTemplate);
-            this.$currentElement.removeAttr(MTemplateJS.MT_LOAD);
-            this.$currentElement.removeAttr(MTemplateJS.MT_USE);
             this.manageSubTemplate();
         };
         MTemplateJS.prototype.append = function ($clonedTemplate) {
@@ -61,7 +59,6 @@
                 var query = MTemplateJS.queryGenerator(MTemplateJS.MT_SUBTEMPLATE, key);
                 $(query).each(function (index, el) {
                     (new MTemplateJS(el, MTemplateJS.arrayGenerator(value), me.option)).run();
-                    el.removeAttribute(MTemplateJS.MT_SUBTEMPLATE);
                 });
             });
         };
@@ -112,7 +109,6 @@
             var query = MTemplateJS.queryGenerator(attributeName, attributeValue), $elements = $clonedTemplate.find(query);
             $elements.each(function (index, elem) {
                 func($(elem));
-                $(elem).removeAttr(attributeName);
             });
         };
         MTemplateJS.queryGenerator = function (attributeName, attributeValue) {
