@@ -2,6 +2,14 @@
     var MTemplateJSOption = (function () {
         function MTemplateJSOption() {
             this.directives = {};
+            this.beforeExecution = function () {
+            };
+            this.afterExecution = function () {
+            };
+            this.beforeAppendItem = function ($element) {
+            };
+            this.afterAppendItem = function ($element) {
+            };
         }
         return MTemplateJSOption;
     }());
@@ -43,20 +51,22 @@
             this.manageSubTemplate();
         };
         MTemplateJS.prototype.append = function ($clonedTemplate) {
+            var clonedTemplateHtml = $clonedTemplate.html(), $element = $(clonedTemplateHtml);
+            this.option.beforeAppendItem($element);
             switch (this.option.effect) {
                 case 'fade':
-                    var $element = $($clonedTemplate.html());
                     $element.hide().appendTo(this.$currentElement).fadeIn(this.option.effectDuration);
                     break;
                 default:
                     this.$currentElement.append($clonedTemplate.html());
                     break;
             }
+            this.option.afterAppendItem($element);
         };
         MTemplateJS.prototype.manageSubTemplate = function () {
             var me = this;
             $.each(me.subTemplates, function (key, value) {
-                var query = MTemplateJS.queryGenerator(MTemplateJS.MT_SUBTEMPLATE, key);
+                var query = MTemplateJS.queryGenerator(MTemplateJS.MT_SUBTEMPLATE);
                 $(query).each(function (index, el) {
                     (new MTemplateJS(el, MTemplateJS.arrayGenerator(value), me.option)).run();
                 });
@@ -64,55 +74,53 @@
         };
         MTemplateJS.prototype.manageDirectives = function (record, $clonedTemplate) {
             var me = this;
-            var _loop_1 = function(key) {
-                this_1.apply($clonedTemplate, MTemplateJS.MT_FUNC, key, function ($elem) {
+            for (var key in this.option.directives) {
+                this.apply($clonedTemplate, MTemplateJS.MT_FUNC, function (key, $elem) {
                     var directive = me.option.directives[key];
                     if (directive) {
                         directive($elem, record);
                     }
                 });
-            };
-            var this_1 = this;
-            for (var key in this.option.directives) {
-                _loop_1(key);
             }
         };
         MTemplateJS.prototype.manageRecord = function (record, $clonedTemplate) {
             var me = this;
-            var _loop_2 = function(key) {
-                this_2.apply($clonedTemplate, MTemplateJS.MT_TEXT, key, function ($elem) {
-                    $elem.html(record[key]);
-                });
-                this_2.apply($clonedTemplate, MTemplateJS.MT_CLASS, key, function ($elem) {
-                    $elem.addClass(record[key]);
-                });
-                this_2.apply($clonedTemplate, MTemplateJS.MT_DATA, key, function ($elem) {
-                    var subTemplateKey = MTemplateJS.UUIDGenerator();
-                    $elem.attr(MTemplateJS.MT_SUBTEMPLATE, subTemplateKey);
-                    me.subTemplates[subTemplateKey] = record[key];
-                });
-                MTemplateJS.ATTRIBUTES.forEach(function (attribute) {
-                    me.manageAttribute($clonedTemplate, key, record, attribute);
-                });
-            };
-            var this_2 = this;
-            for (var key in record) {
-                _loop_2(key);
-            }
-        };
-        MTemplateJS.prototype.manageAttribute = function ($clonedTemplate, key, record, attribute) {
-            this.apply($clonedTemplate, "data-mt-" + attribute, key, function ($elem) {
-                $elem.attr(attribute, record[key]);
+            this.apply($clonedTemplate, MTemplateJS.MT_TEXT, function (key, $elem) {
+                $elem.html(me.returnValue(record, key));
+            });
+            this.apply($clonedTemplate, MTemplateJS.MT_CLASS, function (key, $elem) {
+                $elem.addClass(me.returnValue(record, key));
+            });
+            this.apply($clonedTemplate, MTemplateJS.MT_DATA, function (key, $elem) {
+                var subTemplateKey = MTemplateJS.UUIDGenerator();
+                $elem.attr(MTemplateJS.MT_SUBTEMPLATE, subTemplateKey);
+                me.subTemplates[subTemplateKey] = me.returnValue(record, key);
+            });
+            MTemplateJS.ATTRIBUTES.forEach(function (attribute) {
+                me.manageAttribute($clonedTemplate, record, attribute);
             });
         };
-        MTemplateJS.prototype.apply = function ($clonedTemplate, attributeName, attributeValue, func) {
-            var query = MTemplateJS.queryGenerator(attributeName, attributeValue), $elements = $clonedTemplate.find(query);
+        MTemplateJS.prototype.manageAttribute = function ($clonedTemplate, record, attribute) {
+            var me = this;
+            this.apply($clonedTemplate, "data-mt-" + attribute, function (key, $elem) {
+                $elem.attr(attribute, me.returnValue(record, key));
+            });
+        };
+        MTemplateJS.prototype.apply = function ($clonedTemplate, attributeName, func) {
+            var query = MTemplateJS.queryGenerator(attributeName), $elements = $clonedTemplate.find(query);
             $elements.each(function (index, elem) {
-                func($(elem));
+                func($(elem).attr(attributeName), $(elem));
             });
         };
-        MTemplateJS.queryGenerator = function (attributeName, attributeValue) {
-            return "*[" + attributeName + "=" + attributeValue + "]";
+        MTemplateJS.prototype.returnValue = function (record, key) {
+            var keys = key.split("."), currentValue = record;
+            for (var i = 0; i < keys.length; i++) {
+                currentValue = currentValue[keys[i]];
+            }
+            return currentValue;
+        };
+        MTemplateJS.queryGenerator = function (attributeName) {
+            return "[" + attributeName + "]";
         };
         MTemplateJS.arrayGenerator = function (value) {
             var d = value;
@@ -135,8 +143,11 @@
         return MTemplateJS;
     }());
     $.fn.mtemplatejs = function (data, option) {
-        return this.each(function (index, elem) {
+        option.beforeExecution();
+        var result = this.each(function (index, elem) {
             (new MTemplateJS(elem, MTemplateJS.arrayGenerator(data), option)).run();
         });
+        option.afterExecution();
+        return result;
     };
 })(jQuery);

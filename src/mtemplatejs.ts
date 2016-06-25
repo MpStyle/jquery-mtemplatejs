@@ -2,9 +2,17 @@
 
 (function ($) {
     class MTemplateJSOption {
-        directives:{ [key:string]:($item:JQuery, record:any)=>void } = {};
-        effect:string;
-        effectDuration:number;
+        public directives:{ [key:string]:($item:JQuery, record:any)=>void } = {};
+        public effect:string;
+        public effectDuration:number;
+        public beforeExecution:()=>void = function ():void {
+        };
+        public afterExecution:()=>void = function ():void {
+        };
+        public beforeAppendItem:($element:JQuery)=>void = function ($element:JQuery):void {
+        };
+        public afterAppendItem:($element:JQuery)=>void = function ($element:JQuery):void {
+        };
     }
 
     class MTemplateJS {
@@ -85,32 +93,34 @@
 
             this.append($clonedTemplate);
 
-            // If remove the attributes multiple executions of the plugin could not work correctly
-            // this.$currentElement.removeAttr(MTemplateJS.MT_LOAD);
-            // this.$currentElement.removeAttr(MTemplateJS.MT_USE);
             this.manageSubTemplate();
         }
 
         private append($clonedTemplate) {
+            let clonedTemplateHtml = $clonedTemplate.html(),
+                $element = $(clonedTemplateHtml);
+
+            this.option.beforeAppendItem($element);
+
             switch (this.option.effect) {
                 case 'fade':
-                    let $element=$($clonedTemplate.html());
                     $element.hide().appendTo(this.$currentElement).fadeIn(this.option.effectDuration);
                     break;
                 default:
                     this.$currentElement.append($clonedTemplate.html());
                     break;
             }
+
+            this.option.afterAppendItem($element);
         }
 
         private manageSubTemplate() {
             let me:MTemplateJS = this;
 
             $.each(me.subTemplates, function (key:string, value:Object) {
-                var query:string = MTemplateJS.queryGenerator(MTemplateJS.MT_SUBTEMPLATE, key);
+                var query:string = MTemplateJS.queryGenerator(MTemplateJS.MT_SUBTEMPLATE);
                 $(query).each(function (index, el:Element) {
                     (new MTemplateJS(el, MTemplateJS.arrayGenerator(value), me.option)).run();
-                    // el.removeAttribute(MTemplateJS.MT_SUBTEMPLATE);
                 });
             });
         }
@@ -127,8 +137,8 @@
                 this.apply(
                     $clonedTemplate,
                     MTemplateJS.MT_FUNC,
-                    key,
-                    function ($elem:JQuery) {
+                    // key,
+                    function (key:string, $elem:JQuery) {
                         let directive:($item:JQuery, record:any)=>void = me.option.directives[key];
                         if (directive) {
                             directive($elem, record);
@@ -146,41 +156,36 @@
          */
         private manageRecord(record:any, $clonedTemplate:JQuery) {
             let me = this;
-            for (let key in record) {
-                this.apply(
-                    $clonedTemplate,
-                    MTemplateJS.MT_TEXT,
-                    key,
-                    function ($elem:JQuery) {
-                        $elem.html(record[key]);
-                    }
-                );
 
-                this.apply(
-                    $clonedTemplate,
-                    MTemplateJS.MT_CLASS,
-                    key,
-                    function ($elem:JQuery) {
-                        $elem.addClass(record[key]);
-                    }
-                );
+            this.apply(
+                $clonedTemplate,
+                MTemplateJS.MT_TEXT,
+                function (key:string, $elem:JQuery) {
+                    $elem.html(me.returnValue(record, key));
+                }
+            );
 
-                this.apply(
-                    $clonedTemplate,
-                    MTemplateJS.MT_DATA,
-                    key,
-                    function ($elem:JQuery) {
-                        let subTemplateKey = MTemplateJS.UUIDGenerator();
-                        $elem.attr(MTemplateJS.MT_SUBTEMPLATE, subTemplateKey);
-                        me.subTemplates[subTemplateKey] = record[key];
-                    }
-                );
+            this.apply(
+                $clonedTemplate,
+                MTemplateJS.MT_CLASS,
+                function (key:string, $elem:JQuery) {
+                    $elem.addClass(me.returnValue(record, key));
+                }
+            );
 
-                MTemplateJS.ATTRIBUTES.forEach(function (attribute:string) {
-                    me.manageAttribute($clonedTemplate, key, record, attribute);
-                });
+            this.apply(
+                $clonedTemplate,
+                MTemplateJS.MT_DATA,
+                function (key:string, $elem:JQuery) {
+                    let subTemplateKey = MTemplateJS.UUIDGenerator();
+                    $elem.attr(MTemplateJS.MT_SUBTEMPLATE, subTemplateKey);
+                    me.subTemplates[subTemplateKey] = me.returnValue(record, key);
+                }
+            );
 
-            }
+            MTemplateJS.ATTRIBUTES.forEach(function (attribute:string) {
+                me.manageAttribute($clonedTemplate, record, attribute);
+            });
         }
 
         /**
@@ -197,13 +202,13 @@
          * @param record
          * @param attribute
          */
-        private manageAttribute($clonedTemplate:JQuery, key:any, record:any, attribute:string) {
+        private manageAttribute($clonedTemplate:JQuery, record:any, attribute:string) {
+            let me = this;
             this.apply(
                 $clonedTemplate,
                 "data-mt-" + attribute,
-                key,
-                function ($elem:JQuery) {
-                    $elem.attr(attribute, record[key]);
+                function (key:string, $elem:JQuery) {
+                    $elem.attr(attribute, me.returnValue(record, key));
                 }
             );
         }
@@ -216,18 +221,26 @@
          * @param attributeValue
          * @param func
          */
-        private apply($clonedTemplate:JQuery, attributeName:string, attributeValue:string, func:($elem:JQuery)=>void) {
-            let query:string = MTemplateJS.queryGenerator(attributeName, attributeValue),
+        private apply($clonedTemplate:JQuery, attributeName:string, func:(attributeValue:string, $elem:JQuery)=>void) {
+            let query:string = MTemplateJS.queryGenerator(attributeName),
                 $elements:JQuery = $clonedTemplate.find(query);
 
             $elements.each(function (index:number, elem:Element) {
-                func($(elem));
-                // $(elem).removeAttr(attributeName);
+                func($(elem).attr(attributeName), $(elem));
             })
         }
 
-        private static queryGenerator(attributeName:string, attributeValue:string):string {
-            return "*[" + attributeName + "=" + attributeValue + "]";
+        private returnValue(record:any, key:string):any {
+            let keys:string[] = key.split("."),
+                currentValue:any = record;
+            for (var i:number = 0; i < keys.length; i++) {
+                currentValue = currentValue[keys[i]];
+            }
+            return currentValue;
+        }
+
+        private static queryGenerator(attributeName:string):string {
+            return "[" + attributeName + "]";
         }
 
         public static arrayGenerator(value:Object[]|Object):Object[] {
@@ -250,10 +263,16 @@
     }
 
     $.fn.mtemplatejs = function (data:any, option?:MTemplateJSOption) {
+        option.beforeExecution();
+
         //noinspection TypeScriptUnresolvedFunction
-        return this.each(function (index:number, elem:Element) {
+        let result = this.each(function (index:number, elem:Element) {
             (new MTemplateJS(elem, MTemplateJS.arrayGenerator(data), option)).run();
         });
+
+        option.afterExecution();
+
+        return result;
     };
 
 })(jQuery);

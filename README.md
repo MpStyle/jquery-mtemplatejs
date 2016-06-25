@@ -92,6 +92,15 @@ The only effect supported when it is appending an item is fade.
 ## Sub-template
 The support for the sub-template is guaranteed by the tag _data-mt-data_.
 
+## Hook
+There are some hooks which could be customized:
+- **beforeExecution**: run before the execution of the library
+- **afterExecution**: run after the execution of the library
+- **beforeAppendItem**: run before append a new item 
+- **afterAppendItem**: run after append a new item 
+
+See the *hook* test
+
 ## Development
 - Clone the repository
 - Install NPM
@@ -113,6 +122,11 @@ grunt
 ```
 
 ## History
+
+### 0.0.17
+- Add the possibility to navigate in the data, see the *navigatedata* test
+- Add the hooks, see the *hook* test
+- Improved performance
 
 ### 0.0.16
 - The mt attributes will mantained when the plugin ends the execution.
