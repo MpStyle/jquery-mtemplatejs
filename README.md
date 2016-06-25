@@ -123,6 +123,9 @@ grunt
 
 ## History
 
+### 0.0.18
+- Bug fixing
+
 ### 0.0.17
 - Add the possibility to navigate in the data, see the *navigatedata* test
 - Add the hooks, see the *hook* test

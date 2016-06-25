@@ -52,7 +52,8 @@
         };
         MTemplateJS.prototype.append = function ($clonedTemplate) {
             var clonedTemplateHtml = $clonedTemplate.html(), $element = $(clonedTemplateHtml);
-            this.option.beforeAppendItem($element);
+            if (this.option.beforeAppendItem)
+                this.option.beforeAppendItem($element);
             switch (this.option.effect) {
                 case 'fade':
                     $element.hide().appendTo(this.$currentElement).fadeIn(this.option.effectDuration);
@@ -61,7 +62,8 @@
                     this.$currentElement.append($clonedTemplate.html());
                     break;
             }
-            this.option.afterAppendItem($element);
+            if (this.option.afterAppendItem)
+                this.option.afterAppendItem($element);
         };
         MTemplateJS.prototype.manageSubTemplate = function () {
             var me = this;
@@ -143,11 +145,13 @@
         return MTemplateJS;
     }());
     $.fn.mtemplatejs = function (data, option) {
-        option.beforeExecution();
+        if (option.beforeExecution)
+            option.beforeExecution();
         var result = this.each(function (index, elem) {
             (new MTemplateJS(elem, MTemplateJS.arrayGenerator(data), option)).run();
         });
-        option.afterExecution();
+        if (option.afterExecution)
+            option.afterExecution();
         return result;
     };
 })(jQuery);

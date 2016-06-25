@@ -100,7 +100,8 @@
             let clonedTemplateHtml = $clonedTemplate.html(),
                 $element = $(clonedTemplateHtml);
 
-            this.option.beforeAppendItem($element);
+            if (this.option.beforeAppendItem)
+                this.option.beforeAppendItem($element);
 
             switch (this.option.effect) {
                 case 'fade':
@@ -111,7 +112,8 @@
                     break;
             }
 
-            this.option.afterAppendItem($element);
+            if (this.option.afterAppendItem)
+                this.option.afterAppendItem($element);
         }
 
         private manageSubTemplate() {
@@ -263,14 +265,16 @@
     }
 
     $.fn.mtemplatejs = function (data:any, option?:MTemplateJSOption) {
-        option.beforeExecution();
+        if (option.beforeExecution)
+            option.beforeExecution();
 
         //noinspection TypeScriptUnresolvedFunction
         let result = this.each(function (index:number, elem:Element) {
             (new MTemplateJS(elem, MTemplateJS.arrayGenerator(data), option)).run();
         });
 
-        option.afterExecution();
+        if (option.afterExecution)
+            option.afterExecution();
 
         return result;
     };
