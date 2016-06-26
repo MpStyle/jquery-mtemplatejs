@@ -123,6 +123,9 @@ grunt
 
 ## History
 
+### 0.0.19
+- Changed the signature of the TypeScript interface.
+
 ### 0.0.18
 - Bug fixing
 
