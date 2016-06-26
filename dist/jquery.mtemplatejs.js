@@ -59,7 +59,7 @@
                     $element.hide().appendTo(this.$currentElement).fadeIn(this.option.effectDuration);
                     break;
                 default:
-                    this.$currentElement.append($clonedTemplate.html());
+                    this.$currentElement.append($element);
                     break;
             }
             if (this.option.afterAppendItem)

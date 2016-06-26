@@ -123,6 +123,9 @@ grunt
 
 ## History
 
+### 0.0.22
+- Bug fix: appended element can not be modified
+
 ### 0.0.21
 - Improved performance
 
