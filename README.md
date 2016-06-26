@@ -123,7 +123,7 @@ grunt
 
 ## History
 
-### 0.0.20
+### 0.0.21
 - Improved performance
 
 ### 0.0.19
