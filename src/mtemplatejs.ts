@@ -135,19 +135,16 @@
          */
         private manageDirectives(record:any, $clonedTemplate:JQuery) {
             let me:MTemplateJS = this;
-            for (let key in this.option.directives) {
-                this.apply(
-                    $clonedTemplate,
-                    MTemplateJS.MT_FUNC,
-                    // key,
-                    function (key:string, $elem:JQuery) {
-                        let directive:($item:JQuery, record:any)=>void = me.option.directives[key];
-                        if (directive) {
-                            directive($elem, record);
-                        }
+            this.apply(
+                $clonedTemplate,
+                MTemplateJS.MT_FUNC,
+                function (directiveName:string, $elem:JQuery) {
+                    let directive:($item:JQuery, record:any)=>void = me.option.directives[directiveName];
+                    if (directive) {
+                        directive($elem, record);
                     }
-                );
-            }
+                }
+            );
         }
 
         /**
@@ -241,7 +238,11 @@
             return currentValue;
         }
 
-        private static queryGenerator(attributeName:string):string {
+        private static queryGenerator(attributeName:string, attributeValue?:string):string {
+            if (attributeName) {
+                return "*[" + attributeName + "=" + attributeValue + "]";
+            }
+
             return "[" + attributeName + "]";
         }
 
