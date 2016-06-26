@@ -76,8 +76,9 @@
         };
         MTemplateJS.prototype.manageDirectives = function (record, $clonedTemplate) {
             var me = this;
-            this.apply($clonedTemplate, MTemplateJS.MT_FUNC, function (directiveName, $elem) {
-                var directive = me.option.directives[directiveName];
+            this.apply($clonedTemplate, MTemplateJS.MT_FUNC, function (key, $elem) {
+                var attributeValue = $elem.attr(MTemplateJS.MT_FUNC);
+                var directive = me.option.directives[attributeValue];
                 if (directive) {
                     directive($elem, record);
                 }
@@ -119,10 +120,7 @@
             }
             return currentValue;
         };
-        MTemplateJS.queryGenerator = function (attributeName, attributeValue) {
-            if (attributeName) {
-                return "*[" + attributeName + "=" + attributeValue + "]";
-            }
+        MTemplateJS.queryGenerator = function (attributeName) {
             return "[" + attributeName + "]";
         };
         MTemplateJS.arrayGenerator = function (value) {

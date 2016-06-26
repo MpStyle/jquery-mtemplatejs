@@ -138,13 +138,28 @@
             this.apply(
                 $clonedTemplate,
                 MTemplateJS.MT_FUNC,
-                function (directiveName:string, $elem:JQuery) {
-                    let directive:($item:JQuery, record:any)=>void = me.option.directives[directiveName];
+                function (key:string, $elem:JQuery) {
+                    let attributeValue = $elem.attr(MTemplateJS.MT_FUNC);
+
+                    let directive:($item:JQuery, record:any)=>void = me.option.directives[attributeValue];
                     if (directive) {
                         directive($elem, record);
                     }
                 }
             );
+
+            // let query:string = MTemplateJS.queryGenerator(MTemplateJS.MT_FUNC),
+            //     $elements:JQuery = $clonedTemplate.find(query);
+            //
+            // $elements.each(function (index:number, elem:Element) {
+            //     let $element=$(elem),
+            //         attributeValue=$element.attr(MTemplateJS.MT_FUNC);
+            //
+            //     let directive:($item:JQuery, record:any)=>void = me.option.directives[attributeValue];
+            //     if (directive) {
+            //         directive($element, record);
+            //     }
+            // })
         }
 
         /**
@@ -238,11 +253,7 @@
             return currentValue;
         }
 
-        private static queryGenerator(attributeName:string, attributeValue?:string):string {
-            if (attributeName) {
-                return "*[" + attributeName + "=" + attributeValue + "]";
-            }
-
+        private static queryGenerator(attributeName:string):string {
             return "[" + attributeName + "]";
         }
 
