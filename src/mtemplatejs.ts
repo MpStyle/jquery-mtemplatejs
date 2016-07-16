@@ -43,6 +43,21 @@
          * The template could be inline (in the same html file) or in another file.
          */
         public run() {
+            let me:MTemplateJS = this;
+            me.loadTemplate(me.manageData);
+        }
+
+        public runInclude() {
+            let me:MTemplateJS = this;
+            me.loadTemplate(function () {
+                let $clonedTemplate:JQuery = this.$template.clone(),
+                    uuid:string = MTemplateJS.UUIDGenerator();
+                $clonedTemplate = $('<div>').attr('id', uuid).append($clonedTemplate);
+                me.append($clonedTemplate);
+            });
+        }
+
+        public loadTemplate(afterLoadCallback:()=>void):void {
             let me = this,
                 templateName:string = this.$currentElement.attr(MTemplateJS.MT_USE),
                 templateUrl:string = this.$currentElement.attr(MTemplateJS.MT_LOAD);
@@ -50,13 +65,12 @@
             if (templateUrl) {
                 $.get(templateUrl, function (data:any) {
                     me.$template = $(data);
-                    me.manageData();
-                    console.log(me.$currentElement);
+                    afterLoadCallback.call(me);
                 }, "html");
             }
             if (templateName) {
                 this.$template = $($("#" + templateName).html());
-                this.manageData();
+                afterLoadCallback.call(me);
             }
         }
 
@@ -147,19 +161,6 @@
                     }
                 }
             );
-
-            // let query:string = MTemplateJS.queryGenerator(MTemplateJS.MT_FUNC),
-            //     $elements:JQuery = $clonedTemplate.find(query);
-            //
-            // $elements.each(function (index:number, elem:Element) {
-            //     let $element=$(elem),
-            //         attributeValue=$element.attr(MTemplateJS.MT_FUNC);
-            //
-            //     let directive:($item:JQuery, record:any)=>void = me.option.directives[attributeValue];
-            //     if (directive) {
-            //         directive($element, record);
-            //     }
-            // })
         }
 
         /**
@@ -275,6 +276,21 @@
             return 'a' + (((1 + Math.random()) * 0x1000000) | 0).toString(16).substring(1);
         }
     }
+
+    $.fn.mincludejs = function (option?:MTemplateJSOption) {
+        if (option.beforeExecution)
+            option.beforeExecution();
+
+        //noinspection TypeScriptUnresolvedFunction
+        let result = this.each(function (index:number, elem:Element) {
+            (new MTemplateJS(elem, undefined, option)).runInclude();
+        });
+
+        if (option.afterExecution)
+            option.afterExecution();
+
+        return result;
+    };
 
     $.fn.mtemplatejs = function (data:any, option?:MTemplateJSOption) {
         if (option.beforeExecution)

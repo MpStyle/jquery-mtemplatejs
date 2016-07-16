@@ -1,6 +1,6 @@
 # jQuery - MTemplateJS
 A template plugin for jQuery. Allows templating without dirtying the JavaScript code with HTML markup. Fast and simple.
-A lot of attributes supported in only 2,3 KB.
+A lot of attributes supported in only 3.5 KB (minified).
 
 ## Include
 ```html
@@ -99,9 +99,73 @@ There are some hooks which could be customized:
 - **beforeAppendItem**: run before append a new item 
 - **afterAppendItem**: run after append a new item 
 
+Example:
+
+```js
+$("#content").mtemplatejs(data, directives,
+    beforeExecution: function () {
+        console.log("before execution");
+    },
+    afterExecution: function () {
+        console.log("after execution");
+    },
+    beforeAppendItem: function ($element) {
+        console.log("before append item: " + $element);
+    },
+    afterAppendItem: function ($element) {
+        console.log("after append item: " + $element);
+    }
+});
+```
+
 See the *hook* test
 
-## Development
+# jQuery - MIncludeJS
+Simple and stupid way to include a portion of html from another file or inline.
+To include the file you can use the same attributes of MTemplateJS.
+It supports also the hooks. 
+ 
+## Example
+```html
+[...]
+<body>
+
+<script type="text/javascript">
+    $(function () {
+        $("#content").mincludejs({
+            beforeExecution: function () {
+                console.log("before execution");
+            },
+            afterExecution: function () {
+                console.log("after execution");
+            },
+            beforeAppendItem: function ($element) {
+                console.log("before append item: " + $element);
+            },
+            afterAppendItem: function ($element) {
+                console.log("after append item: " + $element);
+            }
+        });
+    });
+
+</script>
+
+<h1>Include</h1>
+<div id="content" data-mt-use="template"></div>
+
+<script id="template" type="text/html">
+
+    <div class="data_container">
+        This is the content!
+    </div>
+
+</script>
+
+</body>
+[...]
+```
+
+# Development
 - Clone the repository
 - Install NPM
 - Install dev dependencies
@@ -121,7 +185,11 @@ To build run:
 grunt
 ```
 
-## History
+# History
+
+### 0.0.23
+- Cleaned code
+- Created mincludejs function
 
 ### 0.0.22
 - Bug fix: appended element can not be modified

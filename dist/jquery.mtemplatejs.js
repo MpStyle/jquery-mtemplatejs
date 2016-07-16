@@ -23,17 +23,28 @@
             this.option = option ? option : new MTemplateJSOption();
         }
         MTemplateJS.prototype.run = function () {
+            var me = this;
+            me.loadTemplate(me.manageData);
+        };
+        MTemplateJS.prototype.runInclude = function () {
+            var me = this;
+            me.loadTemplate(function () {
+                var $clonedTemplate = this.$template.clone(), uuid = MTemplateJS.UUIDGenerator();
+                $clonedTemplate = $('<div>').attr('id', uuid).append($clonedTemplate);
+                me.append($clonedTemplate);
+            });
+        };
+        MTemplateJS.prototype.loadTemplate = function (afterLoadCallback) {
             var me = this, templateName = this.$currentElement.attr(MTemplateJS.MT_USE), templateUrl = this.$currentElement.attr(MTemplateJS.MT_LOAD);
             if (templateUrl) {
                 $.get(templateUrl, function (data) {
                     me.$template = $(data);
-                    me.manageData();
-                    console.log(me.$currentElement);
+                    afterLoadCallback.call(me);
                 }, "html");
             }
             if (templateName) {
                 this.$template = $($("#" + templateName).html());
-                this.manageData();
+                afterLoadCallback.call(me);
             }
         };
         MTemplateJS.prototype.manageData = function () {
@@ -143,6 +154,16 @@
         MTemplateJS.MT_FUNC = 'data-mt-func';
         return MTemplateJS;
     }());
+    $.fn.mincludejs = function (option) {
+        if (option.beforeExecution)
+            option.beforeExecution();
+        var result = this.each(function (index, elem) {
+            (new MTemplateJS(elem, undefined, option)).runInclude();
+        });
+        if (option.afterExecution)
+            option.afterExecution();
+        return result;
+    };
     $.fn.mtemplatejs = function (data, option) {
         if (option.beforeExecution)
             option.beforeExecution();
