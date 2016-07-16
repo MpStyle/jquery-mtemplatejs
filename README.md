@@ -187,6 +187,9 @@ grunt
 
 # History
 
+### 0.0.24
+- Updated the typescript definitions.
+
 ### 0.0.23
 - Cleaned code
 - Created mincludejs function
