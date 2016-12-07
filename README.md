@@ -1,3 +1,6 @@
+# Important
+Use [jT](https://github.com/MpStyle/jt) instead
+
 # jQuery - MTemplateJS
 A template plugin for jQuery. Allows templating without dirtying the JavaScript code with HTML markup. Fast and simple.
 A lot of attributes supported in only 3.5 KB (minified).
